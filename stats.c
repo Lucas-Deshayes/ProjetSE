@@ -188,22 +188,34 @@ void compare_deux_repertoires(char * cheminFichier1) //après -> rajouter chemin
 void stat_sync()
 {
 	char ligne[256];
-
+	int modifier = 0;
+	int creer = 0;
 	FILE * fichier = NULL;
 	fichier = fopen("difference.txt", "r");
 
 	if(fichier == NULL)
-		printf("erreur");
+	{
+		perror("OUVERTURE DE DIFFERENCE.txt");
+		exit(-2)
+	}
 	else{
 		while (fgets(ligne, 256, fichier) != NULL)
 		{
 			char * nomFichier = strtok(ligne, "|");
 			char typeModif = strtok(NULL, "|")[0];
 			if(typeModif == 'M')
+			{
 				printf("%s a été modifié\n", nomFichier);
+				modifier++;
+			}
 			else
+			{
 				printf("%s a été créé\n", nomFichier);
-		} 
+				creer++;
+			}
+		}
+		printf("TOTAL de fichier modifies : %d\n",modifier);
+		printf("TOTAL de fichier crees : %d\n",creer);
 	}
 
 	fclose(fichier);
