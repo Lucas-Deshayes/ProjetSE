@@ -6,29 +6,16 @@
 #include <sys/stat.h>
 
 
-void stat_sync()
-{
-	char ligne[256];
+void copie_fichier(char * cheminFichierSource, char * cheminFichierDestination);
+void copie_liste_fichiers(char * cheminRepertoireSource, char * cheminRepertoireDestination);
 
-	FILE * fichier = NULL;
-	fichier = fopen("modif.txt", "r");
 
-	if(fichier == NULL)
-		printf("erreur");
-	else{
-		while (fgets(ligne, 256, fichier) != NULL)
-		{
-			char * nomFichier = strtok(ligne, "|");
-			char typeModif = strtok(NULL, "|")[0];
-			if(typeModif == 'M')
-				printf("%s a été modifié\n", nomFichier);
-			else
-				printf("%s a été créé\n", nomFichier);
-		} 
-	}
-
-	fclose(fichier);
+int main()
+{   
+	copie_liste_fichiers(".", "b");
+	return 0;
 }
+
 
 void copie_fichier(char * cheminFichierSource, char * cheminFichierDestination)
 {
@@ -59,7 +46,7 @@ void copie_liste_fichiers(char * cheminRepertoireSource, char * cheminRepertoire
 	char cheminFichierSource[100];
 	char cheminFichierDestination[100];
 	FILE * fichierListe = NULL;
-	fichierListe = fopen("modif.txt", "r");
+	fichierListe = fopen("difference.txt", "r");
 
 	if(fichierListe == NULL)
 		printf("erreur");
@@ -90,12 +77,6 @@ void copie_liste_fichiers(char * cheminRepertoireSource, char * cheminRepertoire
 
 }
 
-
-int main()
-{   
-	copie_liste_fichiers(".", "b");
-	return 0;
-}
 
 
 

@@ -14,6 +14,7 @@ int compte_lignes_fichier(char * nomFichier); // finalement inutile :)  (je gard
 void get_heure_modif_fichier(char* fichier,char * modifTime);
 void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistrement, char * modifTime);
 void compare_deux_repertoires(char * cheminFichier1);
+void stat_sync();
 
 
 int main()
@@ -184,6 +185,29 @@ void compare_deux_repertoires(char * cheminFichier1) //après -> rajouter chemin
 
 
 
+void stat_sync()
+{
+	char ligne[256];
+
+	FILE * fichier = NULL;
+	fichier = fopen("difference.txt", "r");
+
+	if(fichier == NULL)
+		printf("erreur");
+	else{
+		while (fgets(ligne, 256, fichier) != NULL)
+		{
+			char * nomFichier = strtok(ligne, "|");
+			char typeModif = strtok(NULL, "|")[0];
+			if(typeModif == 'M')
+				printf("%s a été modifié\n", nomFichier);
+			else
+				printf("%s a été créé\n", nomFichier);
+		} 
+	}
+
+	fclose(fichier);
+}
 
 
 
