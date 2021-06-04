@@ -1,5 +1,8 @@
 #include "Serveur.h"
 
+static pthread_mutex_t  mutexDossierIntegration = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t  mutexDossierBackUp = PTHREAD_MUTEX_INITIALIZER;
+
 bool serveurIntegrationStatut = false;
 bool serveurBackupStatut = false;
 
@@ -14,26 +17,35 @@ void * serveurProduction(){
 void * serveurIntegration(){
 	//while(1) {
 		while(serveurIntegrationStatut){
-			int rdm = rand()%4;
+			int rdm = rand()%5;
 			switch (rdm)
 			{
 			case 0:
 				// 0 - ajout
-				printf("serveurIntegration - Ajout\n");
+				pthread_mutex_lock(& mutexDossierIntegration);
+				printf("serveurIntegration - Ajout fichier\n");
+				pthread_mutex_unlock(& mutexDossierIntegration);
 				break;
 			case 1:
 				// 1 - ecrire
-				printf("serveurIntegration - Ecrire\n");
+				pthread_mutex_lock(& mutexDossierIntegration);
+				printf("serveurIntegration - Ecrire fichier\n");
+				pthread_mutex_unlock(& mutexDossierIntegration);
 				break;
 			case 2:
 				// 2 - supprimer
-				printf("serveurIntegration - Supprimer\n");
+				pthread_mutex_lock(& mutexDossierIntegration);
+				printf("serveurIntegration - Supprimer fichier\n");
+				pthread_mutex_unlock(& mutexDossierIntegration);
 				break;
 			case 3:
 				// 3 ne rien faire
-				printf("serveurIntegration - Ne rien faire\n");
+				pthread_mutex_lock(& mutexDossierIntegration);
+				printf("serveurIntegration - Lire fichier\n");
+				pthread_mutex_unlock(& mutexDossierIntegration);
 				break;	
 			default:
+				printf("serveurIntegration - Ne rien faire\n");
 				break;
 			}
 			// switch random 
@@ -45,10 +57,44 @@ void * serveurIntegration(){
 }
 
 void * serveurBackUp(){
-   /*while(1){
-	   printf("serveurBackUp\n");
-	   sleep(2);
-	}*/
+   //while(1) {
+		while(serveurBackupStatut){
+			int rdm = rand()%5;
+			switch (rdm)
+			{
+			case 0:
+				// 0 - ajout
+				pthread_mutex_lock(& mutexDossierBackUp);
+				printf("serveurBackUp - Ajout fichier\n");
+				pthread_mutex_unlock(& mutexDossierBackUp);
+				break;
+			case 1:
+				// 1 - ecrire
+				pthread_mutex_lock(& mutexDossierBackUp);
+				printf("serveurBackUp - Ecrire fichier\n");
+				pthread_mutex_unlock(& mutexDossierBackUp);
+				break;
+			case 2:
+				// 2 - supprimer
+				pthread_mutex_lock(& mutexDossierBackUp);
+				printf("serveurBackUp - Supprimer fichier\n");
+				pthread_mutex_unlock(& mutexDossierBackUp);
+				break;
+			case 3:
+				// 3 ne rien faire
+				pthread_mutex_lock(& mutexDossierBackUp);
+				printf("serveurBackUp - Lire fichier\n");
+				pthread_mutex_unlock(& mutexDossierBackUp);
+				break;	
+			default:
+				printf("serveurBackUp - Ne rien faire\n");
+				break;
+			}
+			// switch random 
+			rdm = rand()%5;
+			sleep(rdm);			
+		}
+	//}
 	return 0;
 }
 
@@ -60,7 +106,7 @@ int main(int nbarg, char* argv[]){
 	seed = time(NULL);
 	srand(seed);
 	
-	pthread_t tid1;
+	/*pthread_t tid1;
 	pthread_create(&tid1,NULL,serveurProduction,NULL);
 
 	pthread_t tid2;
@@ -74,6 +120,11 @@ int main(int nbarg, char* argv[]){
 
 	pthread_join(tid1,NULL);
 	pthread_join(tid2,NULL);
-	pthread_join(tid3,NULL);
+	pthread_join(tid3,NULL);*/
 
+	pthread_t tid2;
+	serveurIntegrationStatut = true;
+	pthread_create(&tid2,NULL,serveurIntegration,NULL);
+
+	pthread_join(tid2,NULL);
 }
