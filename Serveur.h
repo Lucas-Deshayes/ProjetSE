@@ -7,6 +7,10 @@
 #include <pthread.h>
 #include <stdbool.h>
 
+enum dossiers { 
+    dossierBackUp, 
+    dossierProduction 
+};
 
 #ifndef SERVEUR_H
 #define SERVEUR_H
