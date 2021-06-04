@@ -10,11 +10,14 @@
 #include <sys/stat.h>
 
 void retarde(int secondes);
-int compte_lignes_fichier(char * nomFichier); // finalement inutile :)  (je garde, on sait jamais)
+int compte_lignes_fichier(char * nomFichier);
 void get_heure_modif_fichier(char* fichier,char * modifTime);
 void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistrement, char * modifTime);
 void compare_deux_repertoires(char * cheminFichier1);
 void stat_sync();
+void stats_module_log();
+int compte_nb_caracteres_fichier(char * cheminFichier);
+
 
 
 int main()
@@ -28,33 +31,11 @@ int main()
 	retarde(1); //transformer en rand dans un intervalle - éventuellement par une portion de code
 
 	printf("--- Global: ---\n"); 
-
 	//Temps passé
     	fin = clock(); 
     	tempsPasse = ((double)fin - debut) / CLOCKS_PER_SEC; 
     	printf("%.2f secondes se sont passées.\n", tempsPasse);
-
-	//Taille diff
-	//Nb erreurs
-
-
-	printf("\n--- Serveur d'intégration: ---\n");
-
-	/*int nbLignes = compte_lignes_fichier("ancienRep.txt");
-	printf("yoo: %d", nbLignes);*/
-	enregistre_contenu_rep(".", "ancienRep.txt", modifTime);
-	compare_deux_repertoires("ancienRep.txt");
-
-	//taille diff
-	//nb fichiers reçus
-
-	printf("\n--- Serveur de back up: ---\n");
-	//taille diff
-	//nb fichiers reçus
-	printf("\n--- Serveur de production: ---\n");
-	//taille diff
-	//nb fichiers reçus
-
+stats_module_log();
 	return 0;
 }
 
@@ -70,7 +51,7 @@ void retarde(int secondes)
 }
 
 
-int compte_lignes_fichier(char * nomFichier) // finalement inutile :)  (je garde, on sait jamais)
+int compte_lignes_fichier(char * nomFichier)
 {
 	FILE * fichier = NULL;
 	int c;
@@ -196,7 +177,7 @@ void stat_sync()
 	if(fichier == NULL)
 	{
 		perror("OUVERTURE DE DIFFERENCE.txt");
-		exit(-2)
+		exit(-2);
 	}
 	else{
 		while (fgets(ligne, 256, fichier) != NULL)
@@ -220,6 +201,54 @@ void stat_sync()
 
 	fclose(fichier);
 }
+
+
+void stats_module_log()
+{
+	int nbLignes = compte_lignes_fichier("./modif.txt"); // ./logs.txt
+	int nbCaracteres = compte_nb_caracteres_fichier("./modif.txt"); // ./logs.txt
+
+	if(nbLignes>1)
+		printf("Le fichier logs fait %d lignes, et comporte %d caractères.\n", nbLignes, nbCaracteres);
+	else
+	{
+		if(nbCaracteres == 0)
+			printf("Le fichier logs est vide.\n");
+		else if(nbCaracteres == 1)
+			printf("Le fichier logs fait %d ligne, et comporte %d caractère.\n", nbLignes, nbCaracteres);
+		else
+			printf("Le fichier logs fait %d ligne, et comporte %d caractères.\n", nbLignes, nbCaracteres);
+	}
+}
+
+
+
+int compte_nb_caracteres_fichier(char * cheminFichier)
+{
+	int i;
+	int nbCaracteres = 0;
+	char ligne[256];
+	FILE * fichier = NULL;
+
+	fichier = fopen(cheminFichier, "r");
+
+	if(fichier == NULL)
+	{
+		perror("Erreur\n");
+		exit(-1);
+	}
+	else{
+		while (fgets(ligne, 256, fichier) != NULL)
+		{
+			for(i=0; ligne[i+1] != '\0' ; i++){}
+			nbCaracteres += i;
+		}
+	}
+
+	fclose(fichier);
+	return nbCaracteres;
+}
+
 
 
 
