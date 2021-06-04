@@ -10,20 +10,19 @@
 #include <sys/stat.h>
 
 void get_heure_modif_fichier(char* fichier,char * modifTime);
-void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistrement, char * modifTime);
+void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistrement);
 void compare_deux_repertoires(char * cheminFichier1,char * cheminFichier2);
 
 int main()
 {
 
-	char modifTime[16];
 
 	printf("\n--- Serveur d'int√©gration: ---\n");
 
 	/*int nbLignes = compte_lignes_fichier("ancienRep.txt");
 	printf("yoo: %d", nbLignes);*/
-	enregistre_contenu_rep(".", "ancienRep.txt", modifTime);
-	enregistre_contenu_rep("../test", "nouveauRep.txt", modifTime);
+	enregistre_contenu_rep(".", "ancienRep.txt");
+	enregistre_contenu_rep("../test", "nouveauRep.txt");
 
 	compare_deux_repertoires("ancienRep.txt","nouveauRep.txt");
 
@@ -53,8 +52,9 @@ void get_heure_modif_fichier(char* fichier,char * modifTime)
 }
 
 
-void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistrement, char * modifTime)
+void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistrement)
 {
+	char modifTime[16];
 	struct dirent 	*d;
 	DIR		*dir;
 	char str[100];
@@ -85,23 +85,20 @@ void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistremen
 						nbLettresFichier++;
 					}
 					strcat(str, d->d_name);
-					
+
 					strcat(str, "|");
 					char buf[PATH_MAX + 1];
 					char* chemin = malloc((sizeof(d->d_name)+sizeof(cheminRepertoire) + 1)*sizeof(char));
 					chemin[0] = '\0';
-					//printf("%s\n",cheminRepertoire);
 					strcat(chemin,cheminRepertoire);
-					//printf("%s\n",chemin);
 					strcat(chemin,"/");
 					strcat(chemin,d->d_name);
-					//printf("%s\n",chemin);
 
-					//printf("PATH : %s\n",realpath(chemin, buf));
+
 					realpath(chemin, buf);
 					get_heure_modif_fichier(buf,modifTime);
+
 					strcat(str, modifTime);
-					//printf("%s\n",str);
 					fputs(strcat(str, "\n"), fichier);
 				}
 			}
@@ -138,8 +135,6 @@ void compare_deux_repertoires(char * cheminFichier1,char* cheminFichier2) //apr√
 			char * dateFichier1 = strtok(NULL, "|");
 			char * nomFichier2 = strtok(ligne2, "|");
 			char * dateFichier2 = strtok(NULL, "|");
-			printf("COMPARAISON : %s %s\n",nomFichier1,nomFichier2);
-			//printf("POINTER : %ld\n",ftell(fichier2));
 
 			if(strcmp(nomFichier1,nomFichier2) == 0)
 			{
@@ -167,13 +162,11 @@ void compare_deux_repertoires(char * cheminFichier1,char* cheminFichier2) //apr√
 				strcat(str, "|");
 				strcat(str,"C\n");
 				fputs(str,sortie);
-				//printf("%ld\n",ftell(fichier2));
 				fseek(fichier2,0,SEEK_SET);
 				for (int i = 0; i < ligne; i++)
 				{
 					fgets(ligne2,sizeof(ligne2),fichier2);
 				}
-				//printf("%ld\n",ftell(fichier2));
 			}
 
 		}
