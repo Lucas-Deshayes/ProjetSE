@@ -1,11 +1,7 @@
 #include "Serveur.h"
 
-#define ITERATIONS 10
-
-int var_globale = 10;
 bool serveurIntegrationStatut = false;
 bool serveurBackupStatut = false;
-
 
 void * serveurProduction(){
    /*while(1){
