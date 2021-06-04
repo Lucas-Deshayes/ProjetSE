@@ -7,11 +7,31 @@ bool serveurProductionStatut = false;
 bool serveurBackupStatut = false;
 
 void * serveurIntegration(){
+	while (1){
 
-	/*while(1){
-	   printf("Serveur de Production\n");
-	   sleep(2);
-	}*/
+		int rdm = rand()%5;
+		sleep(rdm);
+
+		while (serveurProductionStatut){
+			pthread_mutex_lock(& mutexDossierProduction);
+			// Synchro dans Dossier Production vers Dossier BackUp
+			pthread_mutex_unlock(& mutexDossierProduction);
+			rdm = rand()%5;
+			sleep(rdm);	
+		}
+
+		while (serveurBackupStatut){
+			pthread_mutex_lock(& mutexDossierBackUp);
+			// Synchro dans Dossier BackUp vers Dossier Production
+			pthread_mutex_unlock(& mutexDossierBackUp);
+			rdm = rand()%5;
+			sleep(rdm);	
+		}
+
+		if (serveurProductionStatut == false && serveurBackupStatut == false){
+			printf("Aucun serveur ne tourne\n");
+		}
+	}
 	return 0;
 }
 
@@ -90,16 +110,16 @@ void ajout_fichier(char* dossier) {
 
 
 int main(int nbarg, char* argv[]){
-
 	
 	time_t seed;
 	seed = time(NULL);
 	srand(seed);
 	
-	/*
 	pthread_t tid1;
 	pthread_create(&tid1,NULL,serveurIntegration,NULL);
+	pthread_join(tid1,NULL);
 
+	/*
 	pthread_t tid2;
 	serveurProductionStatut = true;
 	pthread_create(&tid2,NULL,serveurProduction,NULL);
