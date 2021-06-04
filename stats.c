@@ -1,14 +1,17 @@
+#define _XOPEN_SOURCE
+#define _XOPEN_SOURCE_EXTENDED 1
 #include <stdio.h>
+#include <limits.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <time.h>
 #include <dirent.h>
 #include <string.h>
 #include <sys/stat.h>
 
-
 void retarde(int secondes);
 int compte_lignes_fichier(char * nomFichier); // finalement inutile :)  (je garde, on sait jamais)
-void get_heure_modif_fichier(char * modifTime);
+void get_heure_modif_fichier(char* fichier,char * modifTime);
 void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistrement, char * modifTime);
 void compare_deux_repertoires(char * cheminFichier1);
 
@@ -18,7 +21,7 @@ int main()
   	clock_t debut, fin; 
     	double tempsPasse; 
 
-	char modifTime[15];
+	char modifTime[16];
 
    	debut = clock();
 	retarde(1); //transformer en rand dans un intervalle - éventuellement par une portion de code
@@ -39,7 +42,7 @@ int main()
 	/*int nbLignes = compte_lignes_fichier("ancienRep.txt");
 	printf("yoo: %d", nbLignes);*/
 	enregistre_contenu_rep(".", "ancienRep.txt", modifTime);
-	//compare_deux_repertoires("ancienRep.txt");
+	compare_deux_repertoires("ancienRep.txt");
 
 	//taille diff
 	//nb fichiers reçus
@@ -47,12 +50,11 @@ int main()
 	printf("\n--- Serveur de back up: ---\n");
 	//taille diff
 	//nb fichiers reçus
-
 	printf("\n--- Serveur de production: ---\n");
 	//taille diff
 	//nb fichiers reçus
 
-	return 0;	
+	return 0;
 }
 
 
@@ -89,15 +91,18 @@ int compte_lignes_fichier(char * nomFichier) // finalement inutile :)  (je garde
 }
 
 
-void get_heure_modif_fichier(char * modifTime)
+void get_heure_modif_fichier(char* fichier,char * modifTime)
 {
-	struct stat st;
-	time_t t = st.st_mtime;
-	struct tm lt;
-
-	localtime_r(&t, &lt);
-	strftime(modifTime, sizeof(modifTime) * 15, "%s", &lt);
+	//struct stat st;
+	//time_t t = st.st_mtime;
+	struct tm* lt;
+	struct stat attr;
+    stat(fichier, &attr);
+    printf("Last modified time: %s", ctime(&attr.st_mtime));
+	lt = localtime(&attr.st_mtime);
+	strftime(modifTime, sizeof(modifTime) * 15, "%s", lt);
 	printf("szfvrhgzcfegiAHHHHHHHHHHHHHHHHHHH: %s\n",modifTime);
+    
 }
 
 
@@ -105,9 +110,8 @@ void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistremen
 {
 	struct dirent 	*d;
 	DIR		*dir;
-	
+	char str[100];
 	int nbLettresFichier;
-	char * str = malloc(0 * sizeof(char *));
 
 	dir = opendir(cheminRepertoire);
 
@@ -128,18 +132,17 @@ void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistremen
 				if(strcmp(d->d_name, ".") != 0 && strcmp(d->d_name, "..") != 0)
 				{
 					fseek(fichier, 0, SEEK_END);
-									
-					str = realloc(str, nbLettresFichier * sizeof(char*) );
-
+					str[0]='\0';
 					nbLettresFichier = 0; 
 					while((d->d_name)[nbLettresFichier] != '\0')
 					{
 						nbLettresFichier++;
 					}
-
 					strcpy(str, d->d_name);
 					strcat(str, "|");
-					get_heure_modif_fichier(modifTime);
+					char buf[PATH_MAX + 1];
+					realpath(d->d_name, buf);
+					get_heure_modif_fichier(buf,modifTime);
 					strcat(str, modifTime);
 					fputs(strcat(str, "\n"), fichier);
 				}
@@ -149,7 +152,7 @@ void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistremen
 	}
 
 
-	if (closedir(dir) == -1) 
+	if (closedir(dir) == -1)
 		printf("erreur\n");
 
 }
@@ -171,6 +174,10 @@ void compare_deux_repertoires(char * cheminFichier1) //après -> rajouter chemin
 			printf("%s\n", nomFichier);
 			char * dateFichier = strtok(NULL, "|");
 			printf("%s\n", dateFichier);
+			struct tm time;
+			strptime(dateFichier,"%s",&time);
+			time_t temps = mktime(&time);
+			printf("%s\n",ctime(&temps));
 		} 
 	}
 }
