@@ -33,13 +33,7 @@ void * serveurIntegration(){
 				pthread_mutex_unlock(& mutexDossierIntegration);
 				break;
 			case 2:
-				// 2 - supprimer
-				pthread_mutex_lock(& mutexDossierIntegration);
-				printf("serveurIntegration - Supprimer fichier\n");
-				pthread_mutex_unlock(& mutexDossierIntegration);
-				break;
-			case 3:
-				// 3 ne rien faire
+				// 2 Lire
 				pthread_mutex_lock(& mutexDossierIntegration);
 				printf("serveurIntegration - Lire fichier\n");
 				pthread_mutex_unlock(& mutexDossierIntegration);
@@ -48,7 +42,6 @@ void * serveurIntegration(){
 				printf("serveurIntegration - Ne rien faire\n");
 				break;
 			}
-			// switch random 
 			rdm = rand()%5;
 			sleep(rdm);			
 		}
@@ -75,13 +68,7 @@ void * serveurBackUp(){
 				pthread_mutex_unlock(& mutexDossierBackUp);
 				break;
 			case 2:
-				// 2 - supprimer
-				pthread_mutex_lock(& mutexDossierBackUp);
-				printf("serveurBackUp - Supprimer fichier\n");
-				pthread_mutex_unlock(& mutexDossierBackUp);
-				break;
-			case 3:
-				// 3 ne rien faire
+				// 2 Lire
 				pthread_mutex_lock(& mutexDossierBackUp);
 				printf("serveurBackUp - Lire fichier\n");
 				pthread_mutex_unlock(& mutexDossierBackUp);
@@ -90,7 +77,6 @@ void * serveurBackUp(){
 				printf("serveurBackUp - Ne rien faire\n");
 				break;
 			}
-			// switch random 
 			rdm = rand()%5;
 			sleep(rdm);			
 		}
