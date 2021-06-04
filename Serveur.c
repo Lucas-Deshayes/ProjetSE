@@ -104,8 +104,64 @@ void * serveurBackUp(){
 	return 0;
 }
 
-void ajout_fichier(char* dossier) {
 
+void random_string(char *s, int len, bool fichier) {
+    char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    int i,debut;
+	if (fichier){
+		debut=1;
+		s[0]='/';
+	}
+	else 
+		debut=0;
+
+	for (i=debut; i < len; ++i) {
+        s[i] = alphabet[rand() % (sizeof(alphabet) - 1)];
+    }
+    s[len] = 0;
+}
+
+
+int random_intervalle(int a, int b) {
+	return (rand()%(b-a)) + a;
+}
+
+
+void ajout_fichier(enum dossiers d) {
+	// creation d'un nom de fichier aleatoire
+	int tailleNomFichier = random_intervalle(5,15);
+	char nomFichier[tailleNomFichier];
+	random_string(nomFichier,tailleNomFichier,true);
+	strcat(nomFichier,".txt");
+	printf("%s\n\n",nomFichier);
+
+	// creation du texte aleatoire
+	int tailleTexteFichier = random_intervalle(50,200);
+	char texteFichier[tailleTexteFichier];
+	random_string(texteFichier,tailleTexteFichier,false);
+	//printf("%s\n",texteFichier);
+
+	//creation du fichier dans le dossier choisit
+	FILE* fichier = NULL;
+	char dossier[50];
+	dossier[0] = '\0';
+	if(d == DossierBackUp)
+		strcat(dossier,"DossierBackUp");
+	else if(d == DossierProduction) 
+		strcat(dossier,"DossierProduction");
+
+	strcat(dossier,nomFichier);
+	printf("%s\n",dossier);
+	fichier = fopen(dossier, "w");
+
+	// ecriture dans le fichier
+	if (fichier != NULL) {
+		fputs(texteFichier, fichier);
+		fclose(fichier);
+	}
+	else {
+		printf("Impossible d'ouvrir le fichier");
+	}
 }
 
 
@@ -114,12 +170,17 @@ int main(int nbarg, char* argv[]){
 	time_t seed;
 	seed = time(NULL);
 	srand(seed);
+	enum dossiers d = DossierProduction; 
+
+	ajout_fichier(d);
+
+	/*pthread_t tid1;
+	pthread_create(&tid1,NULL,serveurProduction,NULL);
 	
 	pthread_t tid1;
 	pthread_create(&tid1,NULL,serveurIntegration,NULL);
 	pthread_join(tid1,NULL);
 
-	/*
 	pthread_t tid2;
 	serveurProductionStatut = true;
 	pthread_create(&tid2,NULL,serveurProduction,NULL);
