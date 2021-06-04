@@ -12,6 +12,7 @@ void * serveurProduction(){
 	   printf("Serveur de Production\n");
 	   sleep(2);
 	}*/
+	return 0;
 }
 
 void * serveurIntegration(){
@@ -44,6 +45,7 @@ void * serveurIntegration(){
 			sleep(rdm);			
 		}
 	//}
+	return 0;
 }
 
 void * serveurBackUp(){
@@ -51,10 +53,17 @@ void * serveurBackUp(){
 	   printf("serveurBackUp\n");
 	   sleep(2);
 	}*/
+	return 0;
 }
+
+
 
 int main(int nbarg, char* argv[]){
 
+	time_t seed;
+	seed = time(NULL);
+	srand(seed);
+	
 	pthread_t tid1;
 	pthread_create(&tid1,NULL,serveurProduction,NULL);
 
