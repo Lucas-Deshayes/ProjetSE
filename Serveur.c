@@ -21,23 +21,23 @@ void * serveurIntegration(){
 			switch (rdm)
 			{
 			case 0:
-				// 0 - ajout
+				// 0 - Ajout
 				pthread_mutex_lock(& mutexDossierIntegration);
 				printf("serveurIntegration - Ajout fichier\n");
 				pthread_mutex_unlock(& mutexDossierIntegration);
 				break;
 			case 1:
-				// 1 - ecrire
+				// 1 - Ecrire
 				pthread_mutex_lock(& mutexDossierIntegration);
 				printf("serveurIntegration - Ecrire fichier\n");
 				pthread_mutex_unlock(& mutexDossierIntegration);
 				break;
 			case 2:
-				// 2 Lire
+				// 2 - Lire
 				pthread_mutex_lock(& mutexDossierIntegration);
 				printf("serveurIntegration - Lire fichier\n");
 				pthread_mutex_unlock(& mutexDossierIntegration);
-				break;	
+				break;
 			default:
 				printf("serveurIntegration - Ne rien faire\n");
 				break;
@@ -56,19 +56,19 @@ void * serveurBackUp(){
 			switch (rdm)
 			{
 			case 0:
-				// 0 - ajout
+				// 0 - Ajout
 				pthread_mutex_lock(& mutexDossierBackUp);
 				printf("serveurBackUp - Ajout fichier\n");
 				pthread_mutex_unlock(& mutexDossierBackUp);
 				break;
 			case 1:
-				// 1 - ecrire
+				// 1 - Ecrire
 				pthread_mutex_lock(& mutexDossierBackUp);
 				printf("serveurBackUp - Ecrire fichier\n");
 				pthread_mutex_unlock(& mutexDossierBackUp);
 				break;
 			case 2:
-				// 2 Lire
+				// 2 - Lire
 				pthread_mutex_lock(& mutexDossierBackUp);
 				printf("serveurBackUp - Lire fichier\n");
 				pthread_mutex_unlock(& mutexDossierBackUp);
