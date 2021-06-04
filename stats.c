@@ -60,7 +60,10 @@ int compte_lignes_fichier(char * nomFichier)
 	fichier = fopen(nomFichier, "r");
 
 	if(fichier == NULL)
-		printf("erreur");
+	{
+		perror("ERREUR OUVERTURE DE FICHIER\n");
+		exit(-1);
+	}
 	else
 	{
 		while((c=fgetc(fichier)) != EOF)
@@ -79,8 +82,8 @@ void get_heure_modif_fichier(char* fichier,char * modifTime)
 	//time_t t = st.st_mtime;
 	struct tm* lt;
 	struct stat attr;
-    stat(fichier, &attr);
-    printf("Last modified time: %s", ctime(&attr.st_mtime));
+    	stat(fichier, &attr);
+    	printf("Last modified time: %s", ctime(&attr.st_mtime));
 	lt = localtime(&attr.st_mtime);
 	strftime(modifTime, sizeof(modifTime) * 15, "%s", lt);
 	printf("szfvrhgzcfegiAHHHHHHHHHHHHHHHHHHH: %s\n",modifTime);
@@ -98,7 +101,10 @@ void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistremen
 	dir = opendir(cheminRepertoire);
 
 	if(dir == NULL)
-		printf("erreur\n");	
+	{
+		perror("ERREUR OUVERTURE DE REPERTOIRE\n");
+		exit(-1);
+	}
 	
 	else
 	{
@@ -148,7 +154,10 @@ void compare_deux_repertoires(char * cheminFichier1) //après -> rajouter chemin
 	fichier = fopen(cheminFichier1, "r");
 
 	if(fichier == NULL)
-		printf("erreur");
+	{
+		perror("ERREUR OUVERTURE DE FICHIER\n");
+		exit(-1);
+	}
 	else{
 		while (fgets(ligne, 256, fichier) != NULL)
 		{
@@ -234,7 +243,7 @@ int compte_nb_caracteres_fichier(char * cheminFichier)
 
 	if(fichier == NULL)
 	{
-		perror("Erreur\n");
+		perror("ERREUR OUVERTURE DE FICHIER\n");
 		exit(-1);
 	}
 	else{
