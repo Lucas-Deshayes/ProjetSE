@@ -1,42 +1,62 @@
 #include "Serveur.h"
 
-static pthread_mutex_t  mutexDossierIntegration = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t  mutexDossierProduction = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t  mutexDossierBackUp = PTHREAD_MUTEX_INITIALIZER;
 
-bool serveurIntegrationStatut = false;
+bool serveurProductionStatut = false;
 bool serveurBackupStatut = false;
 
-void * serveurProduction(){
-   /*while(1){
-	   printf("Serveur de Production\n");
-	   sleep(2);
-	}*/
+void * serveurIntegration(){
+	while (1){
+
+		int rdm = rand()%5;
+		sleep(rdm);
+
+		while (serveurProductionStatut){
+			pthread_mutex_lock(& mutexDossierProduction);
+			// Synchro dans Dossier Production vers Dossier BackUp
+			pthread_mutex_unlock(& mutexDossierProduction);
+			rdm = rand()%5;
+			sleep(rdm);	
+		}
+
+		while (serveurBackupStatut){
+			pthread_mutex_lock(& mutexDossierBackUp);
+			// Synchro dans Dossier BackUp vers Dossier Production
+			pthread_mutex_unlock(& mutexDossierBackUp);
+			rdm = rand()%5;
+			sleep(rdm);	
+		}
+
+		if (serveurProductionStatut == false && serveurBackupStatut == false){
+			printf("Aucun serveur ne tourne\n");
+		}
+	}
 	return 0;
 }
 
-void * serveurIntegration(){
-	//while(1) {
-		while(serveurIntegrationStatut){
+void * serveurProduction(){
+   //while(1) {
+		while(serveurProductionStatut){
 			int rdm = rand()%5;
-			switch (rdm)
-			{
+			switch (rdm){
 			case 0:
 				// 0 - Ajout
-				pthread_mutex_lock(& mutexDossierIntegration);
+				pthread_mutex_lock(& mutexDossierProduction);
 				printf("serveurIntegration - Ajout fichier\n");
-				pthread_mutex_unlock(& mutexDossierIntegration);
+				pthread_mutex_unlock(& mutexDossierProduction);
 				break;
 			case 1:
 				// 1 - Ecrire
-				pthread_mutex_lock(& mutexDossierIntegration);
+				pthread_mutex_lock(& mutexDossierProduction);
 				printf("serveurIntegration - Ecrire fichier\n");
-				pthread_mutex_unlock(& mutexDossierIntegration);
+				pthread_mutex_unlock(& mutexDossierProduction);
 				break;
 			case 2:
 				// 2 - Lire
-				pthread_mutex_lock(& mutexDossierIntegration);
+				pthread_mutex_lock(& mutexDossierProduction);
 				printf("serveurIntegration - Lire fichier\n");
-				pthread_mutex_unlock(& mutexDossierIntegration);
+				pthread_mutex_unlock(& mutexDossierProduction);
 				break;
 			default:
 				printf("serveurIntegration - Ne rien faire\n");
@@ -146,7 +166,7 @@ void ajout_fichier(enum dossiers d) {
 
 
 int main(int nbarg, char* argv[]){
-
+	
 	time_t seed;
 	seed = time(NULL);
 	srand(seed);
@@ -156,10 +176,14 @@ int main(int nbarg, char* argv[]){
 
 	/*pthread_t tid1;
 	pthread_create(&tid1,NULL,serveurProduction,NULL);
+	
+	pthread_t tid1;
+	pthread_create(&tid1,NULL,serveurIntegration,NULL);
+	pthread_join(tid1,NULL);
 
 	pthread_t tid2;
-	serveurIntegrationStatut = true;
-	pthread_create(&tid2,NULL,serveurIntegration,NULL);
+	serveurProductionStatut = true;
+	pthread_create(&tid2,NULL,serveurProduction,NULL);
 
 
 	pthread_t tid3;
@@ -169,10 +193,5 @@ int main(int nbarg, char* argv[]){
 	pthread_join(tid1,NULL);
 	pthread_join(tid2,NULL);
 	pthread_join(tid3,NULL);
-
-	pthread_t tid2;
-	serveurIntegrationStatut = true;
-	pthread_create(&tid2,NULL,serveurIntegration,NULL);
-
-	pthread_join(tid2,NULL);*/
+	*/
 }
