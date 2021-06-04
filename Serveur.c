@@ -1,11 +1,4 @@
-#include <sys/types.h>	//pour le type pid_t (entier sur 32bits sur la plupart des UNIX
-#include <unistd.h>		//pour le fork()
-#include <stdio.h>		//perror() et printf()
-#include <stdlib.h>		//pour utiliser le rand() => man 3 rand
-#include <time.h>		//pour utiliser le time()
-#include <sys/wait.h>
-#include <pthread.h>
-#include <stdbool.h>
+#include "Serveur.h"
 
 #define ITERATIONS 10
 
@@ -48,9 +41,7 @@ void * serveurIntegration(){
 			}
 			// switch random 
 			rdm = rand()%5;
-			sleep(rdm);
-			printf("serveurIntegration\n");
-			
+			sleep(rdm);			
 		}
 	//}
 }
