@@ -1,44 +1,4 @@
-#define _XOPEN_SOURCE
-#define _XOPEN_SOURCE_EXTENDED 1
-#include <stdio.h>
-#include <limits.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-#include <dirent.h>
-#include <string.h>
-#include <sys/stat.h>
-
-void get_heure_modif_fichier(char* fichier,char * modifTime);
-void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistrement);
-void compare_deux_repertoires(char * cheminFichier1,char * cheminFichier2);
-
-int main()
-{
-
-
-	printf("\n--- Serveur d'intégration: ---\n");
-
-	/*int nbLignes = compte_lignes_fichier("ancienRep.txt");
-	printf("yoo: %d", nbLignes);*/
-	enregistre_contenu_rep(".", "ancienRep.txt");
-	enregistre_contenu_rep("../test", "nouveauRep.txt");
-
-	compare_deux_repertoires("ancienRep.txt","nouveauRep.txt");
-
-	//taille diff
-	//nb fichiers reçus
-
-	printf("\n--- Serveur de back up: ---\n");
-	//taille diff
-	//nb fichiers reçus
-	printf("\n--- Serveur de production: ---\n");
-	//taille diff
-	//nb fichiers reçus
-
-	return 0;
-}
-
+#include "synchro_liste.h"
 
 void get_heure_modif_fichier(char* fichier,char * modifTime)
 {
@@ -47,8 +7,8 @@ void get_heure_modif_fichier(char* fichier,char * modifTime)
     stat(fichier, &attr);
 	lt = localtime(&attr.st_mtime);
 	strftime(modifTime, sizeof(modifTime) * 15, "%s", lt);
-	printf("CHEMIN : %s\n",fichier);
-	printf("TEMPS : %s\n",ctime(&attr.st_mtime));
+	//printf("CHEMIN : %s\n",fichier);
+	//printf("TEMPS : %s\n",ctime(&attr.st_mtime));
 }
 
 
@@ -129,46 +89,58 @@ void compare_deux_repertoires(char * cheminFichier1,char* cheminFichier2) //apr�
 	}
 	else{
 		int ligne = 0;
-		while (fgets(ligne1, 256, fichier1) != NULL && fgets(ligne2,sizeof(ligne2),fichier2) != NULL)
+		while (fgets(ligne1, 256, fichier1) != NULL )
 		{
 			char * nomFichier1 = strtok(ligne1, "|");
 			char * dateFichier1 = strtok(NULL, "|");
-			char * nomFichier2 = strtok(ligne2, "|");
-			char * dateFichier2 = strtok(NULL, "|");
-
-			if(strcmp(nomFichier1,nomFichier2) == 0)
+			if(fgets(ligne2,sizeof(ligne2),fichier2) != NULL)
 			{
-				struct tm time;
-				strptime(dateFichier1,"%s",&time);
-				time_t temps1 = mktime(&time);
-				strptime(dateFichier2,"%s",&time);
-				time_t temps2 = mktime(&time);
-				if(difftime(temps1,temps2) != 0)
+				char * nomFichier2 = strtok(ligne2, "|");
+				char * dateFichier2 = strtok(NULL, "|");
+
+				if(strcmp(nomFichier1,nomFichier2) == 0)
+				{
+					struct tm time;
+					strptime(dateFichier1,"%s",&time);
+					time_t temps1 = mktime(&time);
+					strptime(dateFichier2,"%s",&time);
+					time_t temps2 = mktime(&time);
+					if(difftime(temps1,temps2) != 0)
+					{
+						char str[100];
+						str[0] ='\0';
+						strcat(str,nomFichier1);
+						strcat(str, "|");
+						strcat(str,"M\n");
+						fputs(str,sortie);
+					}
+					ligne++;
+				}
+				else //FICHIER DIFFERENT
 				{
 					char str[100];
 					str[0] ='\0';
 					strcat(str,nomFichier1);
 					strcat(str, "|");
-					strcat(str,"M\n");
+					strcat(str,"C\n");
 					fputs(str,sortie);
+					fseek(fichier2,0,SEEK_SET);
+					for (int i = 0; i < ligne; i++)
+					{
+						fgets(ligne2,sizeof(ligne2),fichier2);
+					}
 				}
-				ligne++;
 			}
-			else //FICHIER DIFFERENT
+			else
 			{
+				//printf("HEREGOOD\n");
 				char str[100];
 				str[0] ='\0';
 				strcat(str,nomFichier1);
 				strcat(str, "|");
 				strcat(str,"C\n");
 				fputs(str,sortie);
-				fseek(fichier2,0,SEEK_SET);
-				for (int i = 0; i < ligne; i++)
-				{
-					fgets(ligne2,sizeof(ligne2),fichier2);
-				}
 			}
-
 		}
 	}
 	fclose(fichier1);
