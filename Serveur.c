@@ -30,9 +30,10 @@ void * serveurIntegration(){
 				printf("Serveur Integration - Stat serveur\n");
 				break;
 			case 2:
-				//pthread_mutex_lock(& mutexFichierLogs);
-				//WriteLog("Serveur Integration -");
-				//pthread_mutex_unlock(& mutexFichierLogs);
+				printf("Serveur Integration - Logs\n");
+				pthread_mutex_lock(& mutexFichierLogs);
+				WriteLog(" - Serveur Integration");
+				pthread_mutex_unlock(& mutexFichierLogs);
 				break;
 			default:
 				pthread_mutex_lock(& mutexDossierProduction);
@@ -59,6 +60,9 @@ void * serveurIntegration(){
 				break;
 			case 2:
 				printf("Serveur Integration - Logs\n");
+				pthread_mutex_lock(& mutexFichierLogs);
+				WriteLog(" - Serveur Integration");
+				pthread_mutex_unlock(& mutexFichierLogs);
 				break;
 			default:
 				pthread_mutex_lock(& mutexDossierProduction);
@@ -85,39 +89,55 @@ void * serveurProduction(){
    	while(1) {
 		int rdm;
 		while(serveurProductionStatut){
-			rdm = rand()%5;
+			rdm = rand()%8;
 			switch (rdm){
-			case 0:
-				// 0 - Ajout
-				pthread_mutex_lock(& mutexDossierProduction);
-				printf("Serveur Production - Ajout fichier\n");
-				ajout_fichier(d);
-				pthread_mutex_unlock(& mutexDossierProduction);
-				break;
-			case 1:
-				// 1 - Ecrire
-				pthread_mutex_lock(& mutexDossierProduction);
-				printf("Serveur Production - Ecrire fichier\n");
-				pthread_mutex_unlock(& mutexDossierProduction);
-				break;
-			case 2:
-				// 2 - Lire
-				pthread_mutex_lock(& mutexDossierProduction);
-				printf("Serveur Production - Lire fichier\n");
-				pthread_mutex_unlock(& mutexDossierProduction);
-				break;
-			case 3:
-				printf("Serveur Production - Arret en cours\n");
-				serveurProductionStatut = false;
-				break;
-			default:
-				printf("Serveur Production - Ne rien faire\n");
-				break;
+				case 0:
+					// 0 - Ajout
+					pthread_mutex_lock(& mutexDossierProduction);
+					printf("Serveur Production - Ajout fichier\n");
+					ajout_fichier(d);
+					pthread_mutex_unlock(& mutexDossierProduction);
+					break;
+				case 1:
+					// 1 - Ecrire
+					pthread_mutex_lock(& mutexDossierProduction);
+					printf("Serveur Production - Ecrire fichier\n");
+					pthread_mutex_unlock(& mutexDossierProduction);
+					break;
+				case 2:
+					// 2 - Lire
+					pthread_mutex_lock(& mutexDossierProduction);
+					printf("Serveur Production - Lire fichier\n");
+					pthread_mutex_unlock(& mutexDossierProduction);
+					break;
+				case 3:
+					// 3 - Suppression
+					printf("Serveur Production - Suppression fichier\n");
+					break;
+				case 4:
+					// 4 - Logs
+					printf("Serveur Production - Logs\n");
+					pthread_mutex_lock(& mutexFichierLogs);
+					WriteLog(" - Serveur Production");
+					pthread_mutex_unlock(& mutexFichierLogs);
+					break;
+				case 5:
+					// 5 - Stat
+					printf("Serveur Production - Stat\n");
+					break;
+				case 6:
+					// 6 - Arret
+					printf("Serveur Production - Arret en cours\n");
+					serveurProductionStatut = false;
+					break;
+				default:
+					printf("Serveur Production - Ne rien faire\n");
+					break;
 			}
 			rdm = rand()%5;
 			sleep(rdm);
 		}
-		rdm = rand()%5;
+		rdm = rand()%8;
 		if (rdm > 3){
 			serveurProductionStatut = true;
 			printf("Serveur Production - Redemarage\n");
@@ -131,7 +151,7 @@ void * serveurBackUp(){
    	while(1) {
 		while(serveurBackupStatut){
 			if(!serveurProductionStatut){
-				int rdm = rand()%5;
+				int rdm = rand()%6;
 				switch (rdm){
 					case 0:
 						// 0 - Ajout
@@ -152,6 +172,21 @@ void * serveurBackUp(){
 						printf("Serveur BackUp - Lire fichier\n");
 						pthread_mutex_unlock(& mutexDossierBackUp);
 						break;	
+					case 3:
+						// 3 - Suppression
+						printf("Serveur BackUp - Suppression fichier\n");
+						break;
+					case 4:
+						// 4 - Logs
+						printf("Serveur BackUp - Logs\n");
+						pthread_mutex_lock(& mutexFichierLogs);
+						WriteLog(" - Serveur BackUp");
+						pthread_mutex_unlock(& mutexFichierLogs);
+						break;
+					case 5:
+						// 5 - Stat
+						printf("Serveur BackUp - Stat\n");
+						break;
 					default:
 						printf("Serveur BackUp - Ne rien faire\n");
 						break;
@@ -163,9 +198,6 @@ void * serveurBackUp(){
 	}
 	return 0;
 }
-
-
-
 
 void synchroProductionToBackUp () {
 
@@ -192,8 +224,6 @@ void synchroBackUpToProduction (){
     copie_liste_fichiers(cheminP,cheminB);
 
 }
-
-
 
 void random_string(char *s, int len, bool fichier) {
     char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -405,21 +435,14 @@ int main(int nbarg, char* argv[]){
 	time_t seed;
 	seed = time(NULL);
 	srand(seed);
-	//enum dossiers d = DossierProduction; 
-	//lecture_fichier(d);
-
-	WriteLog("Serveur Production - ");
-
-	sleep(5);
-	WriteLog("Serveur Integration - ");
-
-	sleep(3);
-	WriteLog("Serveur BackUp - ");
 
 	/*enum dossiers d = DossierProduction; 
+	lecture_fichier(d);
+
+	enum dossiers d = DossierProduction; 
 	modifier_fichier(d);*/
 
-	/*pthread_t tid1;
+	pthread_t tid1;
 	pthread_create(&tid1,NULL,serveurIntegration,NULL);
 
 	pthread_t tid2;
@@ -432,5 +455,5 @@ int main(int nbarg, char* argv[]){
 
 	pthread_join(tid1,NULL);
 	pthread_join(tid2,NULL);
-	pthread_join(tid3,NULL);*/
+	pthread_join(tid3,NULL);
 }
