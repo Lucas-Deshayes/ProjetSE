@@ -1,0 +1,2 @@
+fichier1.txt|M
+fichier2.txt|M

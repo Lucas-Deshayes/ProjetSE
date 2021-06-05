@@ -12,11 +12,10 @@ void get_heure_modif_fichier(char* fichier,char * modifTime)
 }
 
 
-void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistrement)
-{
+void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistrement){
 	char modifTime[16];
-	struct dirent 	*d;
-	DIR		*dir;
+	struct dirent *d;
+	DIR *dir;
 	char str[100];
 	int nbLettresFichier;
 
@@ -66,12 +65,10 @@ void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistremen
 		fclose(fichier);
 	}
 
-
 	if (closedir(dir) == -1)
 		printf("erreur\n");
 
 }
-
 
 void compare_deux_repertoires(char * cheminFichier1,char* cheminFichier2) //après -> rajouter cheminFichier2
 {

@@ -1,4 +1,6 @@
 #include "Serveur.h"
+#include "synchro_liste.h"
+#include "cpyListe.h"
 
 static pthread_mutex_t  mutexDossierProduction = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t  mutexDossierBackUp = PTHREAD_MUTEX_INITIALIZER;
@@ -14,15 +16,19 @@ void * serveurIntegration(){
 
 		while (serveurProductionStatut){
 			pthread_mutex_lock(& mutexDossierProduction);
-			// Synchro dans Dossier Production vers Dossier BackUp
+			pthread_mutex_lock(& mutexDossierBackUp);
+			synchroProductionToBackUp();
 			pthread_mutex_unlock(& mutexDossierProduction);
+			pthread_mutex_unlock(& mutexDossierBackUp);
 			rdm = rand()%5;
 			sleep(rdm);	
 		}
 
 		while (serveurBackupStatut){
+			pthread_mutex_lock(& mutexDossierProduction);
 			pthread_mutex_lock(& mutexDossierBackUp);
-			// Synchro dans Dossier BackUp vers Dossier Production
+			synchroBackUpToProduction();
+			pthread_mutex_unlock(& mutexDossierProduction);
 			pthread_mutex_unlock(& mutexDossierBackUp);
 			rdm = rand()%5;
 			sleep(rdm);	
@@ -164,17 +170,47 @@ void ajout_fichier(enum dossiers d) {
 	}
 }
 
+void synchroProductionToBackUp (){
+
+	char* cheminP = "./DossierProduction";
+    char* cheminB = "./DossierBackUp";
+
+    enregistre_contenu_rep(cheminB,"ancienRep.txt");
+    enregistre_contenu_rep(cheminP,"nouveauRep.txt");
+
+    compare_deux_repertoires("nouveauRep.txt","ancienRep.txt"); // Copie de Production vers BackUp
+    copie_liste_fichiers(cheminP,cheminB);
+
+}
+
+void synchroBackUpToProduction (){
+
+	char* cheminP = "./DossierBackUp";
+    char* cheminB = "./DossierProduction";
+
+    enregistre_contenu_rep(cheminB,"ancienRep.txt");
+    enregistre_contenu_rep(cheminP,"nouveauRep.txt");
+
+    compare_deux_repertoires("nouveauRep.txt","ancienRep.txt"); // Copie de BackUp vers Production
+    copie_liste_fichiers(cheminP,cheminB);
+
+}
+
 
 int main(int nbarg, char* argv[]){
 	
 	time_t seed;
 	seed = time(NULL);
 	srand(seed);
-	enum dossiers d = DossierProduction; 
+	enum dossiers d = DossierProduction;
 
-	ajout_fichier(d);
+	synchroProductionToBackUp();
+	synchroBackUpToProduction();
 
-	/*pthread_t tid1;
+	//ajout_fichier(d);
+
+	/*
+	pthread_t tid1;
 	pthread_create(&tid1,NULL,serveurProduction,NULL);
 	
 	pthread_t tid1;

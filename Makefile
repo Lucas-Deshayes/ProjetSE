@@ -1,5 +1,5 @@
 CC=gcc
-fichiers=Serveur.c 
+fichiers=Serveur.c synchro_liste.c cpyListe.c
 exec=exec
 
 all:
