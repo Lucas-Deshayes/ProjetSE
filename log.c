@@ -11,6 +11,8 @@ void WriteLog(char* log){
 			char* heure = ctime(&t);   // mettre le temps dans une variable de type string
 			strcat(heure, log);
 			fputs(heure, log_file);
+			fputs("----------------------\n", log_file);
+			fputs("\n", log_file);
 			fclose(log_file);
 	}
 	else{
