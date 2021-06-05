@@ -405,10 +405,10 @@ int main(int nbarg, char* argv[]){
 	time_t seed;
 	seed = time(NULL);
 	srand(seed);
+	//enum dossiers d = DossierProduction; 
+	//lecture_fichier(d);
 
 	WriteLog("Serveur Production - ");
-	/*enum dossiers d = DossierProduction; 
-	lecture_fichier(d);*/
 
 	sleep(5);
 	WriteLog("Serveur Integration - ");
