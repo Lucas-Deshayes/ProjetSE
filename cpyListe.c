@@ -42,27 +42,38 @@ void copie_liste_fichiers(char * cheminRepertoireSource, char * cheminRepertoire
 	else{
 		while (fgets(ligne, 256, fichierListe) != NULL)
 		{
-			char * nomFichier = strtok(ligne, "|"); //segmente la ligne récupérée afin de récupérer la partie avant le séparateur "|"
-
-			if(strcmp(nomFichier,"\0") != 0) //si ce n'est pas la fin du fichier
+			
+			char * nomFichier = strtok(ligne, "|");//segmente la ligne récupérée afin de récupérer la partie avant le séparateur "|"
+			char typeModif = strtok(NULL, "|")[0];
+			if(typeModif == 'M' || typeModif == 'C')//si il faut mettre à jour le fichier ou l'ajouter.
 			{
-				//concataine le chemin du répertoire src + "/" + nom du fichier src, afin de récuperer le chemin du fichier src  
-				strcpy(cheminFichierSource,cheminRepertoireSource);
-				strcat(cheminFichierSource,"/");
-				strcat(cheminFichierSource,nomFichier);
+				if(strcmp(nomFichier,"\0") != 0)//si ce n'est pas la fin du fichier
+				{
+					//concataine le chemin du répertoire src + "/" + nom du fichier src, afin de récuperer le chemin du fichier src  
+					strcpy(cheminFichierSource,cheminRepertoireSource);
+					strcat(cheminFichierSource,"/");
+					strcat(cheminFichierSource,nomFichier);
 
-				//concataine le chemin du répertoire dst + "/" + nom du fichier dst, afin de récuperer le chemin du fichier dst  
+					//concataine le chemin du répertoire dst + "/" + nom du fichier dst, afin de récuperer le chemin du fichier dst  
+					strcpy(cheminFichierDestination,cheminRepertoireDestination);
+					strcat(cheminFichierDestination,"/");
+					strcat(cheminFichierDestination,nomFichier);
+
+					/*printf("src:%s\n", cheminFichierSource);
+					printf("dst:%s\n", cheminFichierDestination);
+					printf("---------------------\n");*/
+
+					copie_fichier(cheminFichierSource, cheminFichierDestination);
+				}
+			}
+			else if (typeModif == 'S')//Supprimer les fichiers en trop
+			{
 				strcpy(cheminFichierDestination,cheminRepertoireDestination);
 				strcat(cheminFichierDestination,"/");
 				strcat(cheminFichierDestination,nomFichier);
-
-				/*printf("src:%s\n", cheminFichierSource);
-				printf("dst:%s\n", cheminFichierDestination);
-				printf("---------------------\n");*/
-
-				copie_fichier(cheminFichierSource, cheminFichierDestination);
+				remove(cheminFichierDestination);
 			}
-		} 
+		}
 	}
 
 	fclose(fichierListe);

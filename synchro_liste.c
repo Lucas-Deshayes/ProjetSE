@@ -16,8 +16,8 @@ void get_heure_modif_fichier(char* fichier,char * modifTime)
 void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistrement)
 {
 	char modifTime[16];
-	struct dirent *d;
-	DIR *dir;
+	struct dirent 	*d;
+	DIR		*dir;
 	char str[100];
 	int nbLettresFichier;
 
@@ -34,7 +34,7 @@ void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistremen
 			perror("erreur");
 		else
 		{
-			while((d = readdir(dir)) != NULL) //Tant qu'il y a des fichiers dans le dossier. 
+			while((d = readdir(dir)) != NULL)//Tant qu'il y a des fichiers dans le dossier. 
 			{
 				if(strcmp(d->d_name, ".") != 0 && strcmp(d->d_name, "..") != 0)
 				{
@@ -55,6 +55,7 @@ void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistremen
 					strcat(chemin,"/");
 					strcat(chemin,d->d_name);
 
+
 					realpath(chemin, buf);//Determaine le chemin absolue du fichier. ecrit le resultat dans buf.
 					get_heure_modif_fichier(buf,modifTime);
 
@@ -66,6 +67,7 @@ void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistremen
 		fclose(fichier);
 	}
 
+
 	if (closedir(dir) == -1)
 		printf("erreur\n");
 
@@ -75,7 +77,6 @@ void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistremen
 //Le dossier 1 en entrée est prioritaire pour la comparaison.
 //Donc si il y a un fichier manquant dans le dossier 2 alors c'est un ajout dans le dossier 2
 //et pas une suppression dans le dossier 1.
-
 void compare_deux_repertoires(char * cheminFichier1,char* cheminFichier2)
 {
 	char ligne1[256];
@@ -101,14 +102,14 @@ void compare_deux_repertoires(char * cheminFichier1,char* cheminFichier2)
 				char * nomFichier2 = strtok(ligne2, "|");
 				char * dateFichier2 = strtok(NULL, "|");
 
-				if(strcmp(nomFichier1,nomFichier2) == 0) // Le meme nom
+				if(strcmp(nomFichier1,nomFichier2) == 0)//Le meme nom
 				{
 					struct tm time;
 					strptime(dateFichier1,"%s",&time);
 					time_t temps1 = mktime(&time);
 					strptime(dateFichier2,"%s",&time);
 					time_t temps2 = mktime(&time);
-					if(difftime(temps1,temps2) != 0) // Si la derniere modification est plus recente.
+					if(difftime(temps1,temps2) != 0)//Si la derniere modification est plus recente.
 					{
 						char str[100];
 						str[0] ='\0';
@@ -141,6 +142,64 @@ void compare_deux_repertoires(char * cheminFichier1,char* cheminFichier2)
 				strcat(str,nomFichier1);
 				strcat(str, "|");
 				strcat(str,"C\n");
+				fputs(str,sortie);
+			}
+		}
+	}
+	fclose(fichier1);
+	fclose(fichier2);
+	fclose(sortie);
+	compare_pour_suppression(cheminFichier1,cheminFichier2);
+}
+void compare_pour_suppression(char * cheminFichier1,char* cheminFichier2)
+{
+	char ligne1[256];
+	char ligne2[256];
+	FILE * fichier1 = NULL;
+	FILE * fichier2 = NULL;
+	fichier1 = fopen(cheminFichier1, "r");
+	fichier2 = fopen(cheminFichier2,"r");
+	FILE * sortie = fopen("difference.txt","a");
+	if(fichier1 == NULL || fichier2 == NULL || sortie == NULL)
+	{
+		perror("erreur //THIS");
+		exit(-1);
+	}
+	else{
+		int ligne = 0;
+		while (fgets(ligne2, 256, fichier2) != NULL )
+		{
+			char * nomFichier2 = strtok(ligne2, "|");
+			if(fgets(ligne1,sizeof(ligne1),fichier1) != NULL)
+			{
+				char * nomFichier1 = strtok(ligne1, "|");
+				printf("COMPARAISON : %s %s\n",nomFichier2,nomFichier1);
+				if(strcmp(nomFichier1,nomFichier2) == 0)//Le meme nom
+				{
+					ligne++;
+				}
+				else //FICHIER DIFFERENT
+				{
+					char str[100];
+					str[0] ='\0';
+					strcat(str,nomFichier2);
+					strcat(str, "|");
+					strcat(str,"S\n");
+					fputs(str,sortie);
+					fseek(fichier1,0,SEEK_SET);
+					for (int i = 0; i < ligne; i++)
+					{
+						fgets(ligne1,sizeof(ligne1),fichier1);
+					}
+				}
+			}
+			else
+			{
+				char str[100];
+				str[0] ='\0';
+				strcat(str,nomFichier2);
+				strcat(str, "|");
+				strcat(str,"S\n");
 				fputs(str,sortie);
 			}
 		}

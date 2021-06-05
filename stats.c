@@ -16,7 +16,6 @@ int compte_lignes_fichier(char * nomFichier);
 int compte_caracteres_fichier(char * cheminFichier);
 
 
-
 int main()
 {   
   	clock_t debut, fin; 
@@ -47,12 +46,12 @@ void retarde(int secondes)
     while( (clock() - debut) < pause );
 }
 
-
 void stat_sync()
 {
 	char ligne[256];
 	int modifier = 0;
 	int creer = 0;
+	int supp = 0;
 	FILE * fichier = NULL;
 	fichier = fopen("difference.txt", "r");
 
@@ -71,19 +70,24 @@ void stat_sync()
 				printf("%s a été modifié\n", nomFichier);
 				modifier++;
 			}
-			else  //sinon c'est une création de fichier
+			else if (typeModif == 'C') // Si symbole de création de fichier
 			{
 				printf("%s a été créé\n", nomFichier);
 				creer++;
 			}
+			else // Sinon c'est une suppression
+			{
+				printf("%s a été supprimé\n", nomFichier);
+				supp++;
+			}
 		}
 		printf("TOTAL de fichier modifies : %d\n",modifier);
 		printf("TOTAL de fichier crees : %d\n",creer);
+		printf("TOTRAL de fichier supprimes : %d\n",supp);
 	}
 
 	fclose(fichier);
 }
-
 
 void stats_module_log()
 {
@@ -154,8 +158,5 @@ int compte_caracteres_fichier(char * cheminFichier)
 	fclose(fichier);
 	return nbCaracteres;
 }
-
-
-
 
 

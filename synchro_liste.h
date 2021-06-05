@@ -12,3 +12,4 @@
 void get_heure_modif_fichier(char* fichier,char * modifTime);
 void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistrement);
 void compare_deux_repertoires(char * cheminFichier1,char * cheminFichier2);
+void compare_pour_suppression(char * cheminFichier1,char* cheminFichier2);
