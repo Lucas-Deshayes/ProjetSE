@@ -313,7 +313,7 @@ void modifier_fichier(enum dossiers d) {
 	DIR *folder;
     struct dirent *entry;
     int files = 0;
-	printf("fichioerrand : %d\n",fichierRandom);
+
 	// path du dossier 
 	char pathDossier[50];
 	pathDossier[0] ='\0';
@@ -402,7 +402,7 @@ void lecture_fichier(enum dossiers d) {
 	DIR *folder;
     struct dirent *entry;
     int files = 0;
-	printf("fichioerrand : %d\n",fichierRandom);
+	
 	// path du dossier 
 	char pathDossier[50];
 	pathDossier[0] ='\0';
@@ -452,7 +452,7 @@ void supprimer_fichier(enum dossiers d) {
 	DIR *folder;
     struct dirent *entry;
     int files = 0;
-	printf("fichioerrand : %d\n",fichierRandom);
+	
 	// path du dossier 
 	char pathDossier[50];
 	pathDossier[0] ='\0';
