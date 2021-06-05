@@ -1,8 +1,18 @@
 #include "log.h"
 
-void WriteLog(const char* log){
+void WriteLog(char* log){
+
+	time_t timestamp = time( NULL );
+    struct tm * pTime = localtime( & timestamp );
+
+    char buffer[80];
+    strftime( buffer, 80, "%d/%m/%Y %H:%M:%S", pTime );
+    printf( "Date and french time : %s\n", buffer );
+
+	//strcat(log,buffer);
+
 	FILE* log_file= NULL;
-	log_file = fopen("fichier_log.txt", "a");
+	log_file = fopen("log.txt", "a");
 	if (log_file != NULL)
 		{
 			fputs("\n", log_file);

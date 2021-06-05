@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <string.h>
 
 #ifndef LOG_H
 #define LOG_H
 
-void WriteLog(const char* log);
+void WriteLog(char* log);
 
 #endif
