@@ -133,13 +133,12 @@ void ajout_fichier(enum dossiers d) {
 	char nomFichier[tailleNomFichier];
 	random_string(nomFichier,tailleNomFichier,true);
 	strcat(nomFichier,".txt");
-	printf("%s\n\n",nomFichier);
 
 	// creation du texte aleatoire
 	int tailleTexteFichier = random_intervalle(50,200);
 	char texteFichier[tailleTexteFichier];
 	random_string(texteFichier,tailleTexteFichier,false);
-	//printf("%s\n",texteFichier);
+	strcat(texteFichier,"\n");
 
 	//creation du fichier dans le dossier choisit
 	FILE* fichier = NULL;
@@ -151,7 +150,6 @@ void ajout_fichier(enum dossiers d) {
 		strcat(dossier,"DossierProduction");
 
 	strcat(dossier,nomFichier);
-	printf("%s\n",dossier);
 	fichier = fopen(dossier, "w");
 
 	// ecriture dans le fichier
@@ -164,19 +162,108 @@ void ajout_fichier(enum dossiers d) {
 	}
 }
 
+int compte_nombre_fichier(char * path) {
+	DIR *folder;
+    struct dirent *entry;
+    int files = 0;
+    folder = opendir(path);
+    if(folder == NULL)
+    {
+        perror("Unable to read directory");
+        return(1);
+    }
+    while( (entry=readdir(folder)) ) {
+        files++;
+    }
+
+    closedir(folder);
+    return files-2;
+}
+
+void modifier_fichier(enum dossiers d) {
+	DIR *folder;
+    struct dirent *entry;
+    int files = 0;
+
+	// path du dossier 
+	char pathDossier[50];
+	strcat(pathDossier,"./");
+	if(d == DossierBackUp)
+		strcat(pathDossier,"DossierBackUp");
+	else if(d == DossierProduction) 
+		strcat(pathDossier,"DossierProduction");
+	printf("test");
+
+	// fichier aleatoire
+	int nbfichiers = compte_nombre_fichier(pathDossier);
+	printf("nbfichier : %d\n",nbfichiers);
+	int fichierRandom;
+	if(nbfichiers==1)
+		fichierRandom = 0;
+	else
+		fichierRandom = random_intervalle(0,nbfichiers);
+
+    folder = opendir(pathDossier);
+    if(folder == NULL)
+    {
+        perror("Unable to read directory");
+    }
+	char pathFichier[50];
+	pathFichier[0] = '\0';   
+	printf("test\n\n");
+	// parcourt des fichiers
+    while( (entry=readdir(folder)) )
+    {
+		if (strcmp(entry->d_name,".")!=0 && strcmp(entry->d_name,"..")!=0){
+		
+			if(fichierRandom==files){
+				printf("file : %s\n",entry->d_name);
+				strcpy(pathFichier,pathDossier);
+				strcat(pathFichier,"/");
+				strcat(pathFichier,entry->d_name);
+			}
+			files++;
+		}
+    }
+    closedir(folder);
+	ajout_fin_fichier(pathFichier);
+}
+
+
+void ajout_fin_fichier(char * pathFichier) {
+
+	FILE* fichier = NULL;
+	fichier = fopen(pathFichier, "a");
+
+	// creation du texte aleatoire
+	int tailleTexte = random_intervalle(50,200);
+	char texteAjout[tailleTexte];
+	random_string(texteAjout,tailleTexte,false);
+	strcat(texteAjout,"\n");
+	
+	// ajouter a la suite du fichier
+	if (fichier != NULL) {
+		
+		fputs(texteAjout, fichier);
+		fclose(fichier);
+	}
+	else {
+		printf("Impossible d'ouvrir le fichier");
+	}
+}
 
 int main(int nbarg, char* argv[]){
-	
+
 	time_t seed;
 	seed = time(NULL);
 	srand(seed);
-	enum dossiers d = DossierProduction; 
 
-	ajout_fichier(d);
+	enum dossiers d = DossierProduction; 
+	modifier_fichier(d);
 
 	/*pthread_t tid1;
 	pthread_create(&tid1,NULL,serveurProduction,NULL);
-	
+
 	pthread_t tid1;
 	pthread_create(&tid1,NULL,serveurIntegration,NULL);
 	pthread_join(tid1,NULL);
