@@ -1,2 +1,28 @@
+<<<<<<< HEAD
 8uhQ3sRpL.txt|M
 BaWKrTnq4.txt|M
+=======
+5t8y02LR0.txt|M
+7X0hg5Z1JGA7k.txt|M
+AtUjC.txt|M
+euBTm1cqRDk.txt|M
+flu8XiK.txt|C
+FR0r4cxEBZc.txt|M
+ijCxRQR.txt|M
+LaqAo.txt|M
+m1KxffMN8.txt|M
+oA5oyJn4.txt|M
+OGfh6SMMgz7.txt|M
+pEdp.txt|M
+yKBlb.txt|M
+ZTpQuVf.txt|M
+FR0r4cxEBZc.txt|S
+ijCxRQR.txt|S
+LaqAo.txt|S
+m1KxffMN8.txt|S
+oA5oyJn4.txt|S
+OGfh6SMMgz7.txt|S
+pEdp.txt|S
+yKBlb.txt|S
+ZTpQuVf.txt|S
+>>>>>>> 196b7e7b0d863bc5f6453e7da208bc26afd7bccc
