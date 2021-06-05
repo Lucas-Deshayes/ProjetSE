@@ -139,6 +139,37 @@ void * serveurBackUp(){
 	return 0;
 }
 
+
+
+
+void synchroProductionToBackUp () {
+
+	char* cheminP = "./DossierProduction";
+    char* cheminB = "./DossierBackUp";
+
+    enregistre_contenu_rep(cheminB,"ancienRep.txt");
+    enregistre_contenu_rep(cheminP,"nouveauRep.txt");
+
+    compare_deux_repertoires("nouveauRep.txt","ancienRep.txt"); // Copie de Production vers BackUp
+    copie_liste_fichiers(cheminP,cheminB);
+
+}
+
+void synchroBackUpToProduction (){
+
+	char* cheminP = "./DossierBackUp";
+    char* cheminB = "./DossierProduction";
+
+    enregistre_contenu_rep(cheminB,"ancienRep.txt");
+    enregistre_contenu_rep(cheminP,"nouveauRep.txt");
+
+    compare_deux_repertoires("nouveauRep.txt","ancienRep.txt"); // Copie de BackUp vers Production
+    copie_liste_fichiers(cheminP,cheminB);
+
+}
+
+
+
 void random_string(char *s, int len, bool fichier) {
     char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     int i,debut;
@@ -209,33 +240,6 @@ int compte_nombre_fichier(char * path) {
     }
 	closedir(folder);
     return files-2;
-}
-
-
-void synchroProductionToBackUp () {
-
-	char* cheminP = "./DossierProduction";
-    char* cheminB = "./DossierBackUp";
-
-    enregistre_contenu_rep(cheminB,"ancienRep.txt");
-    enregistre_contenu_rep(cheminP,"nouveauRep.txt");
-
-    compare_deux_repertoires("nouveauRep.txt","ancienRep.txt"); // Copie de Production vers BackUp
-    copie_liste_fichiers(cheminP,cheminB);
-
-}
-
-void synchroBackUpToProduction (){
-
-	char* cheminP = "./DossierBackUp";
-    char* cheminB = "./DossierProduction";
-
-    enregistre_contenu_rep(cheminB,"ancienRep.txt");
-    enregistre_contenu_rep(cheminP,"nouveauRep.txt");
-
-    compare_deux_repertoires("nouveauRep.txt","ancienRep.txt"); // Copie de BackUp vers Production
-    copie_liste_fichiers(cheminP,cheminB);
-
 }
 
 void modifier_fichier(enum dossiers d) {
