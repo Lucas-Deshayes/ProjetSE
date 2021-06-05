@@ -11,10 +11,16 @@ void copie_fichier(char * cheminFichierSource, char * cheminFichierDestination)
 	fichierDestination = fopen(cheminFichierDestination, "w");
 
 	if(fichierSource == NULL || fichierDestination == NULL)
-		printf("erreur\n"); //remplacer par des exit
+	{
+		if(fichierSource == NULL)
+			perror("ERREUR OUVERTURE DU FICHIER SOURCE\n");
+		if(fichierDestination == NULL)
+			perror("ERREUR OUVERTURE DE FICHIER DE DESTINATION\n");
+		exit(-1);
+	}
 	else{
-		while (fgets(ligne, 256, fichierSource) != NULL)
-			fputs(ligne, fichierDestination);
+		while (fgets(ligne, 256, fichierSource) != NULL) //parcourt le fichier source afin d'en récupérer la ligne parcourue
+			fputs(ligne, fichierDestination); //écrit la ligne récupérée dans le fichier de destination
 	}
 
 	fclose(fichierSource);
@@ -37,16 +43,20 @@ void copie_liste_fichiers(char * cheminRepertoireSource, char * cheminRepertoire
 		while (fgets(ligne, 256, fichierListe) != NULL)
 		{
 			
-			char * nomFichier = strtok(ligne, "|");
+			char * nomFichier = strtok(ligne, "|"); //segmente la ligne récupérée afin de récupérer la partie avant le séparateur "|"
 
-			if(strcmp(nomFichier,"\0") != 0)
+			if(strcmp(nomFichier,"\0") != 0) //si ce n'est pas la fin du fichier
 			{
+				//concataine le chemin du répertoire src + "/" + nom du fichier src, afin de récuperer le chemin du fichier src  
 				strcpy(cheminFichierSource,cheminRepertoireSource);
-				strcpy(cheminFichierDestination,cheminRepertoireDestination);
 				strcat(cheminFichierSource,"/");
-				strcat(cheminFichierDestination,"/");
 				strcat(cheminFichierSource,nomFichier);
+
+				//concataine le chemin du répertoire dst + "/" + nom du fichier dst, afin de récuperer le chemin du fichier dst  
+				strcpy(cheminFichierDestination,cheminRepertoireDestination);
+				strcat(cheminFichierDestination,"/");
 				strcat(cheminFichierDestination,nomFichier);
+
 				printf("src:%s\n", cheminFichierSource);
 				printf("dst:%s\n", cheminFichierDestination);
 				printf("---------------------\n");
