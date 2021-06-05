@@ -26,9 +26,6 @@ void * serveurIntegration(){
 				printf("Serveur Integration - Test serveur\n");
 				testServer(serveurProductionStatut,serveurBackupStatut);
 				break;
-			case 1:
-				printf("Serveur Integration - Stat serveur\n");
-				break;
 			case 2:
 				printf("Serveur Integration - Logs\n");
 				pthread_mutex_lock(& mutexFichierLogs);
@@ -40,6 +37,7 @@ void * serveurIntegration(){
 				pthread_mutex_lock(& mutexDossierBackUp);
 				printf("Serveur Integration - Synchro ProductionToBackUp\n");
 				synchroProductionToBackUp();
+				stat_sync();
 				pthread_mutex_unlock(& mutexDossierProduction);
 				pthread_mutex_unlock(& mutexDossierBackUp);
 				break;
@@ -69,6 +67,7 @@ void * serveurIntegration(){
 				pthread_mutex_lock(& mutexDossierBackUp);
 				printf("Serveur Integration - Synchro BackUpToProduction\n");
 				synchroBackUpToProduction();
+				stat_sync();
 				pthread_mutex_unlock(& mutexDossierProduction);
 				pthread_mutex_unlock(& mutexDossierBackUp);
 				break;
@@ -89,7 +88,7 @@ void * serveurProduction(){
    	while(1) {
 		int rdm;
 		while(serveurProductionStatut){
-			rdm = rand()%8;
+			rdm = rand()%6;
 			switch (rdm){
 				case 0:
 					// 0 - Ajout
@@ -124,20 +123,18 @@ void * serveurProduction(){
 					printf("Serveur Production - Logs\n");
 					pthread_mutex_lock(& mutexFichierLogs);
 					WriteLog("Serveur Production\n");
+					stats_module_log();
 					pthread_mutex_unlock(& mutexFichierLogs);
 					break;
 				case 5:
-					// 5 - Stat
-					printf("Serveur Production - Stat\n");
-					break;
-				case 6:
-					// 6 - Arret
+					// 5 - Arret
 					printf("Serveur Production - Arret en cours\n");
 					serveurProductionStatut = false;
 					pthread_mutex_lock(& mutexDossierProduction);
 					pthread_mutex_lock(& mutexDossierBackUp);
 					printf("Serveur Integration - Synchro ProductionToBackUp\n");
 					synchroProductionToBackUp();
+					stat_sync();
 					pthread_mutex_unlock(& mutexDossierProduction);
 					pthread_mutex_unlock(& mutexDossierBackUp);
 					break;
@@ -148,16 +145,17 @@ void * serveurProduction(){
 			rdm = rand()%5;
 			sleep(rdm);
 		}
-		rdm = rand()%8;
-		if (rdm > 3){
+		rdm = rand()%6;
+		if (rdm > 4){
 			serveurProductionStatut = true;
 			pthread_mutex_lock(& mutexDossierProduction);
 			pthread_mutex_lock(& mutexDossierBackUp);
+			printf("Serveur Production - Redemarrage\n");
 			printf("Serveur Integration - Synchro BackUpToProduction\n");
 			synchroBackUpToProduction();
+			stat_sync();
 			pthread_mutex_unlock(& mutexDossierProduction);
 			pthread_mutex_unlock(& mutexDossierBackUp);
-			break;
 		}
 	}
 	return 0;
@@ -203,11 +201,8 @@ void * serveurBackUp(){
 						printf("Serveur BackUp - Logs\n");
 						pthread_mutex_lock(& mutexFichierLogs);
 						WriteLog("Serveur BackUp\n");
+						stats_module_log();
 						pthread_mutex_unlock(& mutexFichierLogs);
-						break;
-					case 5:
-						// 5 - Stat
-						printf("Serveur BackUp - Stat\n");
 						break;
 					default:
 						printf("Serveur BackUp - Ne rien faire\n");
