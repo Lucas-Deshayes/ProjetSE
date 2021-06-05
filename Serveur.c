@@ -7,6 +7,8 @@ static pthread_mutex_t  mutexDossierBackUp = PTHREAD_MUTEX_INITIALIZER;
 
 bool serveurProductionStatut = false;
 bool serveurBackupStatut = false;
+int fichierRandom = 0;
+
 
 void * serveurIntegration(){
 	
@@ -240,7 +242,7 @@ void modifier_fichier(enum dossiers d) {
 	DIR *folder;
     struct dirent *entry;
     int files = 0;
-
+	
 	// path du dossier 
 	char pathDossier[50];
 	strcat(pathDossier,"./");
@@ -248,12 +250,11 @@ void modifier_fichier(enum dossiers d) {
 		strcat(pathDossier,"DossierBackUp");
 	else if(d == DossierProduction) 
 		strcat(pathDossier,"DossierProduction");
-	printf("test");
 
 	// fichier aleatoire
 	int nbfichiers = compte_nombre_fichier(pathDossier);
 	printf("nbfichier : %d\n",nbfichiers);
-	int fichierRandom;
+
 	if(nbfichiers==1)
 		fichierRandom = 0;
 	else
@@ -266,7 +267,7 @@ void modifier_fichier(enum dossiers d) {
     }
 	char pathFichier[50];
 	pathFichier[0] = '\0';   
-	printf("test\n\n");
+
 	// parcourt des fichiers
     while( (entry=readdir(folder)) )
     {
