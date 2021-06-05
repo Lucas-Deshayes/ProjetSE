@@ -282,6 +282,8 @@ void modifier_fichier(enum dossiers d) {
 
 	// fichier aleatoire
 	int nbfichiers = compte_nombre_fichier(pathDossier);
+	if(nbfichiers==0)
+		return;
 	if(nbfichiers==1)
 		fichierRandom = 0;
 	else
@@ -311,6 +313,7 @@ void modifier_fichier(enum dossiers d) {
     }
     closedir(folder);
 	ajout_fin_fichier(pathFichier);
+	fichierRandom = 0;
 }
 
 
@@ -368,6 +371,8 @@ void lecture_fichier(enum dossiers d) {
 
 	// fichier aleatoire
 	int nbfichiers = compte_nombre_fichier(pathDossier);
+	if(nbfichiers==0)
+		return;
 	if(nbfichiers==1)
 		fichierRandom = 0;
 	else
@@ -397,7 +402,58 @@ void lecture_fichier(enum dossiers d) {
     }
     closedir(folder);
 	compte_nombre_caractere(pathFichier);
+	fichierRandom = 0;
 }
+
+
+void supprimer_fichier(enum dossiers d) {
+	DIR *folder;
+    struct dirent *entry;
+    int files = 0;
+	
+	// path du dossier 
+	char pathDossier[50];
+	strcat(pathDossier,"./");
+	if(d == DossierBackUp)
+		strcat(pathDossier,"DossierBackUp");
+	else if(d == DossierProduction) 
+		strcat(pathDossier,"DossierProduction");
+
+	// fichier aleatoire
+	int nbfichiers = compte_nombre_fichier(pathDossier);
+	if(nbfichiers==0)
+		return;
+	if(nbfichiers==1)
+		fichierRandom = 0;
+	else
+		fichierRandom = random_intervalle(0,nbfichiers);
+
+    folder = opendir(pathDossier);
+    if(folder == NULL)
+    {
+        perror("Unable to read directory");
+    }
+	char pathFichier[50];
+	pathFichier[0] = '\0';   
+
+	// parcourt des fichiers
+    while( (entry=readdir(folder)) )
+    {
+		if (strcmp(entry->d_name,".")!=0 && strcmp(entry->d_name,"..")!=0){
+		
+			if(fichierRandom==files){
+				strcpy(pathFichier,pathDossier);
+				strcat(pathFichier,"/");
+				strcat(pathFichier,entry->d_name);
+			}
+			files++;
+		}
+    }
+    closedir(folder);
+	remove(pathFichier);
+	fichierRandom = 0;
+}
+
 
 
 int main(int nbarg, char* argv[]){
@@ -406,15 +462,15 @@ int main(int nbarg, char* argv[]){
 	seed = time(NULL);
 	srand(seed);
 
-	WriteLog("Serveur Production - ");
-	/*enum dossiers d = DossierProduction; 
-	lecture_fichier(d);*/
+	//WriteLog("Serveur Production - ");
+	enum dossiers d = DossierProduction; 
+	supprimer_fichier(d);
 
-	sleep(5);
-	WriteLog("Serveur Integration - ");
+	//sleep(5);
+	//WriteLog("Serveur Integration - ");
 
-	sleep(3);
-	WriteLog("Serveur BackUp - ");
+	//sleep(3);
+	//WriteLog("Serveur BackUp - ");
 
 	/*enum dossiers d = DossierProduction; 
 	modifier_fichier(d);*/
