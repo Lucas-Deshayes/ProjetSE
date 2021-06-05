@@ -1,30 +1,5 @@
 #include "stats.h"
 
-void retarde(int secondes);
-void stat_sync();
-void stats_module_log();
-int compte_lignes_fichier(char * nomFichier);
-int compte_caracteres_fichier(char * cheminFichier);
-
-
-/*int main()
-{   
-  	clock_t debut, fin; 
-    	double tempsPasse; 
-		
-	char modifTime[16];
-
-   	debut = clock();
-	retarde(1); //transformer en rand dans un intervalle - éventuellement par une portion de code
-
-	printf("--- Global: ---\n"); 
-	//Temps passé
-    	fin = clock(); 
-    	tempsPasse = ((double)fin - debut) / CLOCKS_PER_SEC; 
-    	printf("%.2f secondes se sont passées.\n", tempsPasse);
-	stats_module_log();
-	return 0;
-}*/
 
 void retarde(int secondes)
 {
@@ -43,38 +18,44 @@ void stat_sync()
 	int supp = 0;
 	FILE * fichier = NULL;
 	fichier = fopen("difference.txt", "r");
-
-	if(fichier == NULL)
+	FILE * sortie = fopen("stats.txt","a");
+	if(fichier == NULL || sortie == NULL)
 	{
 		perror("OUVERTURE DE DIFFERENCE.txt");
 		exit(-2);
 	}
 	else{
+		time_t t;
+		time(&t);
+		char* heure = ctime(&t);
+		fputs("\n---------STAT_SYNCHRO----------",sortie);
+		fputs(heure,sortie);
 		while (fgets(ligne, 256, fichier) != NULL)
 		{
-			//char * nomFichier = strtok(ligne, "|"); //strtok permet de segmenter une chaîne de caractères sur un caractère donné
+			char * nomFichier = strtok(ligne, "|"); //strtok permet de segmenter une chaîne de caractères sur un caractère donné
 			char typeModif = strtok(ligne, "|")[0]; //NULL signifie qu'il faut continuer de segmenter la chaîne passée en 1er
 			if(typeModif == 'M') //si symbole de modification de fichier
 			{
-				//printf("%s a été modifié\n", nomFichier);
+				fprintf(sortie,"%s a été modifié\n", nomFichier);
 				modifier++;
 			}
 			else if (typeModif == 'C') // Si symbole de création de fichier
 			{
-				//printf("%s a été créé\n", nomFichier);
+				fprintf(sortie,"%s a été créé\n", nomFichier);
 				creer++;
 			}
 			else // Sinon c'est une suppression
 			{
-				//printf("%s a été supprimé\n", nomFichier);
+				fprintf(sortie,"%s a été supprimé\n", nomFichier);
 				supp++;
 			}
 		}
-		//printf("TOTAL de fichier modifies : %d\n",modifier);
-		//printf("TOTAL de fichier crees : %d\n",creer);
-		//printf("TOTRAL de fichier supprimes : %d\n",supp);
+		fprintf(sortie,"\nTotal de fichier modifies : %d\n",modifier);
+		fprintf(sortie,"Total de fichier crees : %d\n",creer);
+		fprintf(sortie,"Total de fichier supprimes : %d\n",supp);
+		fputs("-------------------------------\n",sortie);
 	}
-
+	fclose(sortie);
 	fclose(fichier);
 }
 
@@ -82,18 +63,31 @@ void stats_module_log()
 {
 	int nbLignes = compte_lignes_fichier("log.txt"); // ./logs.txt
 	int nbCaracteres = compte_caracteres_fichier("log.txt"); // ./logs.txt
+	FILE * sortie = fopen("stats.txt","a");
+	time_t t;
+	time(&t);
+	char* heure = ctime(&t);
+	fputs("\n---------STAT_LOG---------------",sortie);
+	fputs(heure,sortie);
+	if(sortie == NULL)
+	{
+		perror("OUVERTURE DE STATS.TXT");
+		exit(-2);
+	}
 
 	if(nbLignes>1)
-		printf("Le fichier logs fait %d lignes, et comporte %d caractères.\n", nbLignes, nbCaracteres);
+		fprintf(sortie,"Le fichier logs fait %d lignes, et comporte %d caractères.\n", nbLignes, nbCaracteres);
 	else
 	{
 		if(nbCaracteres == 0)
-			printf("Le fichier log est vide.\n");
+			fprintf(sortie,"Le fichier log est vide.\n");
 		else if(nbCaracteres == 1)
-			printf("Le fichier log fait %d ligne, et comporte %d caractère.\n", nbLignes, nbCaracteres);
+			fprintf(sortie,"Le fichier log fait %d ligne, et comporte %d caractère.\n", nbLignes, nbCaracteres);
 		else
-			printf("Le fichier log fait %d ligne, et comporte %d caractères.\n", nbLignes, nbCaracteres);
+			fprintf(sortie,"Le fichier log fait %d ligne, et comporte %d caractères.\n", nbLignes, nbCaracteres);
 	}
+	fputs("-------------------------------\n",sortie);
+	fclose(sortie);
 }
 
 
