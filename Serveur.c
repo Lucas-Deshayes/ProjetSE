@@ -1,4 +1,6 @@
 #include "Serveur.h"
+#include "synchro_liste.h"
+#include "cpyListe.h"
 
 static pthread_mutex_t  mutexDossierProduction = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t  mutexDossierBackUp = PTHREAD_MUTEX_INITIALIZER;
@@ -7,22 +9,35 @@ bool serveurProductionStatut = false;
 bool serveurBackupStatut = false;
 
 void * serveurIntegration(){
+	
+	int rdm;
+	
 	while (1){
-
-		int rdm = rand()%5;
-		sleep(rdm);
-
 		while (serveurProductionStatut){
-			pthread_mutex_lock(& mutexDossierProduction);
-			// Synchro dans Dossier Production vers Dossier BackUp
-			pthread_mutex_unlock(& mutexDossierProduction);
+			rdm = rand()%5;
+			switch (rdm){
+			case 0:
+				printf("Serveur Integration - Test serveur\n");
+				break;
+			default:
+				pthread_mutex_lock(& mutexDossierProduction);
+				pthread_mutex_lock(& mutexDossierBackUp);
+				printf("Serveur Integration - Synchro ProductionToBackUp\n");
+				synchroProductionToBackUp();
+				pthread_mutex_unlock(& mutexDossierProduction);
+				pthread_mutex_unlock(& mutexDossierBackUp);
+				break;
+			}
+			
 			rdm = rand()%5;
 			sleep(rdm);	
 		}
 
-		while (serveurBackupStatut){
+		while (serveurBackupStatut && !serveurProductionStatut){
+			pthread_mutex_lock(& mutexDossierProduction);
 			pthread_mutex_lock(& mutexDossierBackUp);
-			// Synchro dans Dossier BackUp vers Dossier Production
+			synchroBackUpToProduction();
+			pthread_mutex_unlock(& mutexDossierProduction);
 			pthread_mutex_unlock(& mutexDossierBackUp);
 			rdm = rand()%5;
 			sleep(rdm);	
@@ -31,19 +46,25 @@ void * serveurIntegration(){
 		if (serveurProductionStatut == false && serveurBackupStatut == false){
 			printf("Aucun serveur ne tourne\n");
 		}
+
+		printf("serveurProductionStatut : %d\n",serveurProductionStatut);
+		sleep(4);
 	}
 	return 0;
 }
 
 void * serveurProduction(){
-   //while(1) {
+	enum dossiers d = DossierProduction;
+   	while(1) {
+		int rdm;
 		while(serveurProductionStatut){
-			int rdm = rand()%5;
+			rdm = rand()%5;
 			switch (rdm){
 			case 0:
 				// 0 - Ajout
 				pthread_mutex_lock(& mutexDossierProduction);
 				printf("serveurIntegration - Ajout fichier\n");
+				ajout_fichier(d);
 				pthread_mutex_unlock(& mutexDossierProduction);
 				break;
 			case 1:
@@ -58,6 +79,10 @@ void * serveurProduction(){
 				printf("serveurIntegration - Lire fichier\n");
 				pthread_mutex_unlock(& mutexDossierProduction);
 				break;
+			case 3:
+				printf("serveurIntegration - Arret en cours\n");
+				serveurProductionStatut = false;
+				break;
 			default:
 				printf("serveurIntegration - Ne rien faire\n");
 				break;
@@ -65,45 +90,52 @@ void * serveurProduction(){
 			rdm = rand()%5;
 			sleep(rdm);			
 		}
-	//}
+		rdm = rand()%5;
+		if (rdm > 3){
+			serveurProductionStatut = true;
+			printf("serveurIntegration - Redemarage\n");
+		}
+	}
 	return 0;
 }
 
 void * serveurBackUp(){
-   //while(1) {
+	enum dossiers d = DossierBackUp;
+   	while(1) {
 		while(serveurBackupStatut){
-			int rdm = rand()%5;
-			switch (rdm)
-			{
-			case 0:
-				// 0 - Ajout
-				pthread_mutex_lock(& mutexDossierBackUp);
-				printf("serveurBackUp - Ajout fichier\n");
-				pthread_mutex_unlock(& mutexDossierBackUp);
-				break;
-			case 1:
-				// 1 - Ecrire
-				pthread_mutex_lock(& mutexDossierBackUp);
-				printf("serveurBackUp - Ecrire fichier\n");
-				pthread_mutex_unlock(& mutexDossierBackUp);
-				break;
-			case 2:
-				// 2 - Lire
-				pthread_mutex_lock(& mutexDossierBackUp);
-				printf("serveurBackUp - Lire fichier\n");
-				pthread_mutex_unlock(& mutexDossierBackUp);
-				break;	
-			default:
-				printf("serveurBackUp - Ne rien faire\n");
-				break;
+			if(!serveurProductionStatut){
+				int rdm = rand()%5;
+				switch (rdm){
+					case 0:
+						// 0 - Ajout
+						pthread_mutex_lock(& mutexDossierBackUp);
+						printf("serveurBackUp - Ajout fichier\n");
+						ajout_fichier(d);
+						pthread_mutex_unlock(& mutexDossierBackUp);
+						break;
+					case 1:
+						// 1 - Ecrire
+						pthread_mutex_lock(& mutexDossierBackUp);
+						printf("serveurBackUp - Ecrire fichier\n");
+						pthread_mutex_unlock(& mutexDossierBackUp);
+						break;
+					case 2:
+						// 2 - Lire
+						pthread_mutex_lock(& mutexDossierBackUp);
+						printf("serveurBackUp - Lire fichier\n");
+						pthread_mutex_unlock(& mutexDossierBackUp);
+						break;	
+					default:
+						printf("serveurBackUp - Ne rien faire\n");
+						break;
+				}
+				rdm = rand()%5;
+				sleep(rdm);			
 			}
-			rdm = rand()%5;
-			sleep(rdm);			
 		}
-	//}
+	}
 	return 0;
 }
-
 
 void random_string(char *s, int len, bool fichier) {
     char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -121,11 +153,9 @@ void random_string(char *s, int len, bool fichier) {
     s[len] = 0;
 }
 
-
 int random_intervalle(int a, int b) {
 	return (rand()%(b-a)) + a;
 }
-
 
 void ajout_fichier(enum dossiers d) {
 	// creation d'un nom de fichier aleatoire
@@ -175,9 +205,35 @@ int compte_nombre_fichier(char * path) {
     while( (entry=readdir(folder)) ) {
         files++;
     }
-
-    closedir(folder);
+	closedir(folder);
     return files-2;
+}
+
+
+void synchroProductionToBackUp () {
+
+	char* cheminP = "./DossierProduction";
+    char* cheminB = "./DossierBackUp";
+
+    enregistre_contenu_rep(cheminB,"ancienRep.txt");
+    enregistre_contenu_rep(cheminP,"nouveauRep.txt");
+
+    compare_deux_repertoires("nouveauRep.txt","ancienRep.txt"); // Copie de Production vers BackUp
+    copie_liste_fichiers(cheminP,cheminB);
+
+}
+
+void synchroBackUpToProduction (){
+
+	char* cheminP = "./DossierBackUp";
+    char* cheminB = "./DossierProduction";
+
+    enregistre_contenu_rep(cheminB,"ancienRep.txt");
+    enregistre_contenu_rep(cheminP,"nouveauRep.txt");
+
+    compare_deux_repertoires("nouveauRep.txt","ancienRep.txt"); // Copie de BackUp vers Production
+    copie_liste_fichiers(cheminP,cheminB);
+
 }
 
 void modifier_fichier(enum dossiers d) {
@@ -266,12 +322,10 @@ int main(int nbarg, char* argv[]){
 
 	pthread_t tid1;
 	pthread_create(&tid1,NULL,serveurIntegration,NULL);
-	pthread_join(tid1,NULL);
 
 	pthread_t tid2;
 	serveurProductionStatut = true;
 	pthread_create(&tid2,NULL,serveurProduction,NULL);
-
 
 	pthread_t tid3;
 	serveurBackupStatut = true;
@@ -279,6 +333,5 @@ int main(int nbarg, char* argv[]){
 
 	pthread_join(tid1,NULL);
 	pthread_join(tid2,NULL);
-	pthread_join(tid3,NULL);
-	*/
+	pthread_join(tid3,NULL);*/
 }

@@ -27,6 +27,8 @@ void random_string(char *s, int len, bool fichier);
 int random_intervalle(int a, int b);
 
 void ajout_fichier(enum dossiers d);
+void synchroProductionToBackUp();
+void synchroBackUpToProduction();
 
 int compte_nombre_fichier(char * path);
 void modifier_fichier(enum dossiers d);
