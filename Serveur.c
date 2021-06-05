@@ -308,6 +308,7 @@ void modifier_fichier(enum dossiers d) {
 	
 	// path du dossier 
 	char pathDossier[50];
+	pathDossier[0] ='\0';
 	strcat(pathDossier,"./");
 	if(d == DossierBackUp)
 		strcat(pathDossier,"DossierBackUp");
@@ -385,7 +386,6 @@ void compte_nombre_caractere(char * pathFichier) {
 	while(fgetc(file) != EOF)
 		compteur ++;
 	}
-	
 	printf("%d caracteres\n", compteur);
 	fclose(file);
 }
@@ -397,6 +397,7 @@ void lecture_fichier(enum dossiers d) {
 	
 	// path du dossier 
 	char pathDossier[50];
+	pathDossier[0] ='\0';
 	strcat(pathDossier,"./");
 	if(d == DossierBackUp)
 		strcat(pathDossier,"DossierBackUp");
@@ -447,6 +448,7 @@ void supprimer_fichier(enum dossiers d) {
 	
 	// path du dossier 
 	char pathDossier[50];
+	pathDossier[0] ='\0';
 	strcat(pathDossier,"./");
 	if(d == DossierBackUp)
 		strcat(pathDossier,"DossierBackUp");
@@ -487,7 +489,6 @@ void supprimer_fichier(enum dossiers d) {
 	remove(pathFichier);
 	fichierRandom = 0;
 }
-
 
 
 int main(int nbarg, char* argv[]){

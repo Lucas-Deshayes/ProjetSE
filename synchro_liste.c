@@ -173,7 +173,7 @@ void compare_pour_suppression(char * cheminFichier1,char* cheminFichier2)
 			if(fgets(ligne1,sizeof(ligne1),fichier1) != NULL)
 			{
 				char * nomFichier1 = strtok(ligne1, "|");
-				printf("COMPARAISON : %s %s\n",nomFichier2,nomFichier1);
+				//printf("COMPARAISON : %s %s\n",nomFichier2,nomFichier1);
 				if(strcmp(nomFichier1,nomFichier2) == 0)//Le meme nom
 				{
 					ligne++;
