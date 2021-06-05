@@ -45,7 +45,7 @@ void * serveurIntegration(){
 				break;
 			}
 			rdm = rand()%5;
-			sleep(rdm);	
+			sleep(rdm);
 		}
 
 		while (serveurBackupStatut && !serveurProductionStatut){
@@ -134,6 +134,12 @@ void * serveurProduction(){
 					// 6 - Arret
 					printf("Serveur Production - Arret en cours\n");
 					serveurProductionStatut = false;
+					pthread_mutex_lock(& mutexDossierProduction);
+					pthread_mutex_lock(& mutexDossierBackUp);
+					printf("Serveur Integration - Synchro ProductionToBackUp\n");
+					synchroProductionToBackUp();
+					pthread_mutex_unlock(& mutexDossierProduction);
+					pthread_mutex_unlock(& mutexDossierBackUp);
 					break;
 				default:
 					printf("Serveur Production - Ne rien faire\n");
@@ -145,7 +151,13 @@ void * serveurProduction(){
 		rdm = rand()%8;
 		if (rdm > 3){
 			serveurProductionStatut = true;
-			printf("Serveur Production - Redemarage\n");
+			pthread_mutex_lock(& mutexDossierProduction);
+			pthread_mutex_lock(& mutexDossierBackUp);
+			printf("Serveur Integration - Synchro BackUpToProduction\n");
+			synchroBackUpToProduction();
+			pthread_mutex_unlock(& mutexDossierProduction);
+			pthread_mutex_unlock(& mutexDossierBackUp);
+			break;
 		}
 	}
 	return 0;
