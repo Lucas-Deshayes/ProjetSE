@@ -11,6 +11,8 @@ static pthread_mutex_t  mutexFichierLogs = PTHREAD_MUTEX_INITIALIZER;
 
 bool serveurProductionStatut = false;
 bool serveurBackupStatut = false;
+int fichierRandom = 0;
+
 
 void * serveurIntegration(){
 	
@@ -162,6 +164,37 @@ void * serveurBackUp(){
 	return 0;
 }
 
+
+
+
+void synchroProductionToBackUp () {
+
+	char* cheminP = "./DossierProduction";
+    char* cheminB = "./DossierBackUp";
+
+    enregistre_contenu_rep(cheminB,"ancienRep.txt");
+    enregistre_contenu_rep(cheminP,"nouveauRep.txt");
+
+    compare_deux_repertoires("nouveauRep.txt","ancienRep.txt"); // Copie de Production vers BackUp
+    copie_liste_fichiers(cheminP,cheminB);
+
+}
+
+void synchroBackUpToProduction (){
+
+	char* cheminP = "./DossierBackUp";
+    char* cheminB = "./DossierProduction";
+
+    enregistre_contenu_rep(cheminB,"ancienRep.txt");
+    enregistre_contenu_rep(cheminP,"nouveauRep.txt");
+
+    compare_deux_repertoires("nouveauRep.txt","ancienRep.txt"); // Copie de BackUp vers Production
+    copie_liste_fichiers(cheminP,cheminB);
+
+}
+
+
+
 void random_string(char *s, int len, bool fichier) {
     char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     int i,debut;
@@ -190,7 +223,7 @@ void ajout_fichier(enum dossiers d) {
 	strcat(nomFichier,".txt");
 
 	// creation du texte aleatoire
-	int tailleTexteFichier = random_intervalle(50,200);
+	int tailleTexteFichier = random_intervalle(10,25);
 	char texteFichier[tailleTexteFichier];
 	random_string(texteFichier,tailleTexteFichier,false);
 	strcat(texteFichier,"\n");
@@ -234,38 +267,11 @@ int compte_nombre_fichier(char * path) {
     return files-2;
 }
 
-
-void synchroProductionToBackUp () {
-
-	char* cheminP = "./DossierProduction";
-    char* cheminB = "./DossierBackUp";
-
-    enregistre_contenu_rep(cheminB,"ancienRep.txt");
-    enregistre_contenu_rep(cheminP,"nouveauRep.txt");
-
-    compare_deux_repertoires("nouveauRep.txt","ancienRep.txt"); // Copie de Production vers BackUp
-    copie_liste_fichiers(cheminP,cheminB);
-
-}
-
-void synchroBackUpToProduction (){
-
-	char* cheminP = "./DossierBackUp";
-    char* cheminB = "./DossierProduction";
-
-    enregistre_contenu_rep(cheminB,"ancienRep.txt");
-    enregistre_contenu_rep(cheminP,"nouveauRep.txt");
-
-    compare_deux_repertoires("nouveauRep.txt","ancienRep.txt"); // Copie de BackUp vers Production
-    copie_liste_fichiers(cheminP,cheminB);
-
-}
-
 void modifier_fichier(enum dossiers d) {
 	DIR *folder;
     struct dirent *entry;
     int files = 0;
-
+	
 	// path du dossier 
 	char pathDossier[50];
 	strcat(pathDossier,"./");
@@ -273,16 +279,14 @@ void modifier_fichier(enum dossiers d) {
 		strcat(pathDossier,"DossierBackUp");
 	else if(d == DossierProduction) 
 		strcat(pathDossier,"DossierProduction");
-	printf("test");
 
 	// fichier aleatoire
 	int nbfichiers = compte_nombre_fichier(pathDossier);
-	printf("nbfichier : %d\n",nbfichiers);
-	int fichierRandom;
 	if(nbfichiers==1)
 		fichierRandom = 0;
 	else
 		fichierRandom = random_intervalle(0,nbfichiers);
+
 
     folder = opendir(pathDossier);
     if(folder == NULL)
@@ -291,14 +295,13 @@ void modifier_fichier(enum dossiers d) {
     }
 	char pathFichier[50];
 	pathFichier[0] = '\0';   
-	printf("test\n\n");
+
 	// parcourt des fichiers
     while( (entry=readdir(folder)) )
     {
 		if (strcmp(entry->d_name,".")!=0 && strcmp(entry->d_name,"..")!=0){
 		
 			if(fichierRandom==files){
-				printf("file : %s\n",entry->d_name);
 				strcpy(pathFichier,pathDossier);
 				strcat(pathFichier,"/");
 				strcat(pathFichier,entry->d_name);
@@ -317,7 +320,7 @@ void ajout_fin_fichier(char * pathFichier) {
 	fichier = fopen(pathFichier, "a");
 
 	// creation du texte aleatoire
-	int tailleTexte = random_intervalle(50,200);
+	int tailleTexte = random_intervalle(10,25);
 	char texteAjout[tailleTexte];
 	random_string(texteAjout,tailleTexte,false);
 	strcat(texteAjout,"\n");
@@ -333,6 +336,70 @@ void ajout_fin_fichier(char * pathFichier) {
 	}
 }
 
+void compte_nombre_caractere(char * pathFichier) {
+	int compteur = 0;
+	FILE * file;
+	
+	// ouverture du fichier
+	if ((file = fopen(pathFichier, "r")) == NULL)
+		perror("Erreur à l'ouverture du fichier");
+	else {
+	// parcours du fichier
+	while(fgetc(file) != EOF)
+		compteur ++;
+	}
+	
+	printf("%d caracteres\n", compteur);
+	fclose(file);
+}
+
+void lecture_fichier(enum dossiers d) {
+	DIR *folder;
+    struct dirent *entry;
+    int files = 0;
+	
+	// path du dossier 
+	char pathDossier[50];
+	strcat(pathDossier,"./");
+	if(d == DossierBackUp)
+		strcat(pathDossier,"DossierBackUp");
+	else if(d == DossierProduction) 
+		strcat(pathDossier,"DossierProduction");
+
+	// fichier aleatoire
+	int nbfichiers = compte_nombre_fichier(pathDossier);
+	if(nbfichiers==1)
+		fichierRandom = 0;
+	else
+		fichierRandom = random_intervalle(0,nbfichiers);
+
+    folder = opendir(pathDossier);
+    if(folder == NULL)
+    {
+        perror("Unable to read directory");
+    }
+	char pathFichier[50];
+	pathFichier[0] = '\0';   
+
+	// parcourt des fichiers
+    while( (entry=readdir(folder)) )
+    {
+		if (strcmp(entry->d_name,".")!=0 && strcmp(entry->d_name,"..")!=0){
+		
+			if(fichierRandom==files){
+				printf("--> fichier : %s - ",entry->d_name);
+				strcpy(pathFichier,pathDossier);
+				strcat(pathFichier,"/");
+				strcat(pathFichier,entry->d_name);
+			}
+			files++;
+		}
+    }
+    closedir(folder);
+	compte_nombre_caractere(pathFichier);
+}
+
+
 int main(int nbarg, char* argv[]){
 
 	time_t seed;
@@ -340,6 +407,8 @@ int main(int nbarg, char* argv[]){
 	srand(seed);
 
 	WriteLog("Serveur Production - ");
+	/*enum dossiers d = DossierProduction; 
+	lecture_fichier(d);*/
 
 	sleep(5);
 	WriteLog("Serveur Integration - ");

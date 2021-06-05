@@ -26,12 +26,16 @@ void random_string(char *s, int len, bool fichier);
 
 int random_intervalle(int a, int b);
 
-void ajout_fichier(enum dossiers d);
 void synchroProductionToBackUp();
 void synchroBackUpToProduction();
+
+void ajout_fichier(enum dossiers d);
 
 int compte_nombre_fichier(char * path);
 void modifier_fichier(enum dossiers d);
 void ajout_fin_fichier(char * pathFichier);
+
+void compte_nombre_caractere(char * pathFichier);
+void lecture_fichier(enum dossiers d);
 
 #endif
