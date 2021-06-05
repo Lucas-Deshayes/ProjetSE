@@ -34,4 +34,6 @@ int compte_nombre_fichier(char * path);
 void modifier_fichier(enum dossiers d);
 void ajout_fin_fichier(char * pathFichier);
 
+void lecture_fichier(enum dossiers d);
+
 #endif
