@@ -31,6 +31,7 @@ void * serveurIntegration(){
 				printf("Serveur Integration - Logs\n");
 				pthread_mutex_lock(& mutexFichierLogs);
 				WriteLog("Serveur Integration\n");
+				stats_module_log();
 				pthread_mutex_unlock(& mutexFichierLogs);
 				break;
 			default:
@@ -38,7 +39,7 @@ void * serveurIntegration(){
 				pthread_mutex_lock(& mutexDossierBackUp);
 				printf("Serveur Integration - Synchro ProductionToBackUp\n");
 				synchroProductionToBackUp();
-				stat_sync();
+				//stat_sync();
 				pthread_mutex_unlock(& mutexDossierProduction);
 				pthread_mutex_unlock(& mutexDossierBackUp);
 				break;
@@ -61,6 +62,7 @@ void * serveurIntegration(){
 				printf("Serveur Integration - Logs\n");
 				pthread_mutex_lock(& mutexFichierLogs);
 				WriteLog("Serveur Integration\n");
+				stats_module_log();
 				pthread_mutex_unlock(& mutexFichierLogs);
 				break;
 			default:
@@ -68,7 +70,7 @@ void * serveurIntegration(){
 				pthread_mutex_lock(& mutexDossierBackUp);
 				printf("Serveur Integration - Synchro BackUpToProduction\n");
 				synchroBackUpToProduction();
-				stat_sync();
+				//stat_sync();
 				pthread_mutex_unlock(& mutexDossierProduction);
 				pthread_mutex_unlock(& mutexDossierBackUp);
 				break;
@@ -135,7 +137,7 @@ void * serveurProduction(){
 					pthread_mutex_lock(& mutexDossierBackUp);
 					printf("Serveur Integration - Synchro ProductionToBackUp\n");
 					synchroProductionToBackUp();
-					stat_sync();
+					//stat_sync();
 					pthread_mutex_unlock(& mutexDossierProduction);
 					pthread_mutex_unlock(& mutexDossierBackUp);
 					break;
@@ -154,7 +156,7 @@ void * serveurProduction(){
 			printf("Serveur Production - Redemarrage\n");
 			printf("Serveur Integration - Synchro BackUpToProduction\n");
 			synchroBackUpToProduction();
-			stat_sync();
+			//stat_sync();
 			pthread_mutex_unlock(& mutexDossierProduction);
 			pthread_mutex_unlock(& mutexDossierBackUp);
 		}
