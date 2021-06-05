@@ -3,6 +3,7 @@
 #include "cpyListe.h"
 #include "test_serveur.h"
 #include "log.h"
+#include "stats.h"
 
 static pthread_mutex_t  mutexDossierProduction = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t  mutexDossierBackUp = PTHREAD_MUTEX_INITIALIZER;

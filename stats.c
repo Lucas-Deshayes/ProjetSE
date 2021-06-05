@@ -52,8 +52,8 @@ void stat_sync()
 	else{
 		while (fgets(ligne, 256, fichier) != NULL)
 		{
-			char * nomFichier = strtok(ligne, "|"); //strtok permet de segmenter une chaîne de caractères sur un caractère donné
-			char typeModif = strtok(NULL, "|")[0]; //NULL signifie qu'il faut continuer de segmenter la chaîne passée en 1er
+			//char * nomFichier = strtok(ligne, "|"); //strtok permet de segmenter une chaîne de caractères sur un caractère donné
+			char typeModif = strtok(ligne, "|")[0]; //NULL signifie qu'il faut continuer de segmenter la chaîne passée en 1er
 			if(typeModif == 'M') //si symbole de modification de fichier
 			{
 				//printf("%s a été modifié\n", nomFichier);
