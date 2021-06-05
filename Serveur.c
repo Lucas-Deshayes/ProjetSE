@@ -32,7 +32,7 @@ void * serveurIntegration(){
 			case 2:
 				printf("Serveur Integration - Logs\n");
 				pthread_mutex_lock(& mutexFichierLogs);
-				WriteLog(" - Serveur Integration");
+				WriteLog("Serveur Integration\n");
 				pthread_mutex_unlock(& mutexFichierLogs);
 				break;
 			default:
@@ -61,7 +61,7 @@ void * serveurIntegration(){
 			case 2:
 				printf("Serveur Integration - Logs\n");
 				pthread_mutex_lock(& mutexFichierLogs);
-				WriteLog(" - Serveur Integration");
+				WriteLog("Serveur Integration\n");
 				pthread_mutex_unlock(& mutexFichierLogs);
 				break;
 			default:
@@ -102,23 +102,28 @@ void * serveurProduction(){
 					// 1 - Ecrire
 					pthread_mutex_lock(& mutexDossierProduction);
 					printf("Serveur Production - Ecrire fichier\n");
+					modifier_fichier(d);
 					pthread_mutex_unlock(& mutexDossierProduction);
 					break;
 				case 2:
 					// 2 - Lire
 					pthread_mutex_lock(& mutexDossierProduction);
 					printf("Serveur Production - Lire fichier\n");
+					lecture_fichier(d);
 					pthread_mutex_unlock(& mutexDossierProduction);
 					break;
 				case 3:
 					// 3 - Suppression
+					pthread_mutex_lock(& mutexDossierProduction);
 					printf("Serveur Production - Suppression fichier\n");
+					supprimer_fichier(d);
+					pthread_mutex_unlock(& mutexDossierProduction);
 					break;
 				case 4:
 					// 4 - Logs
 					printf("Serveur Production - Logs\n");
 					pthread_mutex_lock(& mutexFichierLogs);
-					WriteLog(" - Serveur Production");
+					WriteLog("Serveur Production\n");
 					pthread_mutex_unlock(& mutexFichierLogs);
 					break;
 				case 5:
@@ -164,23 +169,28 @@ void * serveurBackUp(){
 						// 1 - Ecrire
 						pthread_mutex_lock(& mutexDossierBackUp);
 						printf("Serveur BackUp - Ecrire fichier\n");
+						modifier_fichier(d);
 						pthread_mutex_unlock(& mutexDossierBackUp);
 						break;
 					case 2:
 						// 2 - Lire
 						pthread_mutex_lock(& mutexDossierBackUp);
 						printf("Serveur BackUp - Lire fichier\n");
+						lecture_fichier(d);
 						pthread_mutex_unlock(& mutexDossierBackUp);
 						break;	
 					case 3:
 						// 3 - Suppression
+						pthread_mutex_lock(& mutexDossierBackUp);
 						printf("Serveur BackUp - Suppression fichier\n");
+						supprimer_fichier(d);
+						pthread_mutex_unlock(& mutexDossierBackUp);
 						break;
 					case 4:
 						// 4 - Logs
 						printf("Serveur BackUp - Logs\n");
 						pthread_mutex_lock(& mutexFichierLogs);
-						WriteLog(" - Serveur BackUp");
+						WriteLog("Serveur BackUp\n");
 						pthread_mutex_unlock(& mutexFichierLogs);
 						break;
 					case 5:
@@ -198,8 +208,6 @@ void * serveurBackUp(){
 	}
 	return 0;
 }
-
-
 
 void synchroProductionToBackUp () {
 
@@ -305,7 +313,7 @@ void modifier_fichier(enum dossiers d) {
 	DIR *folder;
     struct dirent *entry;
     int files = 0;
-	
+	printf("fichioerrand : %d\n",fichierRandom);
 	// path du dossier 
 	char pathDossier[50];
 	pathDossier[0] ='\0';
@@ -394,7 +402,7 @@ void lecture_fichier(enum dossiers d) {
 	DIR *folder;
     struct dirent *entry;
     int files = 0;
-	
+	printf("fichioerrand : %d\n",fichierRandom);
 	// path du dossier 
 	char pathDossier[50];
 	pathDossier[0] ='\0';
@@ -440,12 +448,11 @@ void lecture_fichier(enum dossiers d) {
 	fichierRandom = 0;
 }
 
-
 void supprimer_fichier(enum dossiers d) {
 	DIR *folder;
     struct dirent *entry;
     int files = 0;
-	
+	printf("fichioerrand : %d\n",fichierRandom);
 	// path du dossier 
 	char pathDossier[50];
 	pathDossier[0] ='\0';
@@ -489,7 +496,6 @@ void supprimer_fichier(enum dossiers d) {
 	remove(pathFichier);
 	fichierRandom = 0;
 }
-
 
 int main(int nbarg, char* argv[]){
 
