@@ -42,7 +42,6 @@ void copie_liste_fichiers(char * cheminRepertoireSource, char * cheminRepertoire
 	else{
 		while (fgets(ligne, 256, fichierListe) != NULL)
 		{
-			
 			char * nomFichier = strtok(ligne, "|"); //segmente la ligne récupérée afin de récupérer la partie avant le séparateur "|"
 
 			if(strcmp(nomFichier,"\0") != 0) //si ce n'est pas la fin du fichier
@@ -57,9 +56,9 @@ void copie_liste_fichiers(char * cheminRepertoireSource, char * cheminRepertoire
 				strcat(cheminFichierDestination,"/");
 				strcat(cheminFichierDestination,nomFichier);
 
-				printf("src:%s\n", cheminFichierSource);
+				/*printf("src:%s\n", cheminFichierSource);
 				printf("dst:%s\n", cheminFichierDestination);
-				printf("---------------------\n");
+				printf("---------------------\n");*/
 
 				copie_fichier(cheminFichierSource, cheminFichierDestination);
 			}

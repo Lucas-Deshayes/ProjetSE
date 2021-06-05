@@ -34,7 +34,7 @@ void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistremen
 			perror("erreur");
 		else
 		{
-			while((d = readdir(dir)) != NULL)//Tant qu'il y a des fichiers dans le dossier. 
+			while((d = readdir(dir)) != NULL) //Tant qu'il y a des fichiers dans le dossier. 
 			{
 				if(strcmp(d->d_name, ".") != 0 && strcmp(d->d_name, "..") != 0)
 				{
@@ -54,7 +54,6 @@ void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistremen
 					strcat(chemin,cheminRepertoire);
 					strcat(chemin,"/");
 					strcat(chemin,d->d_name);
-
 
 					realpath(chemin, buf);//Determaine le chemin absolue du fichier. ecrit le resultat dans buf.
 					get_heure_modif_fichier(buf,modifTime);
@@ -76,6 +75,7 @@ void enregistre_contenu_rep(char * cheminRepertoire, char * fichierEnregistremen
 //Le dossier 1 en entrée est prioritaire pour la comparaison.
 //Donc si il y a un fichier manquant dans le dossier 2 alors c'est un ajout dans le dossier 2
 //et pas une suppression dans le dossier 1.
+
 void compare_deux_repertoires(char * cheminFichier1,char* cheminFichier2)
 {
 	char ligne1[256];
@@ -101,14 +101,14 @@ void compare_deux_repertoires(char * cheminFichier1,char* cheminFichier2)
 				char * nomFichier2 = strtok(ligne2, "|");
 				char * dateFichier2 = strtok(NULL, "|");
 
-				if(strcmp(nomFichier1,nomFichier2) == 0)//Le meme nom
+				if(strcmp(nomFichier1,nomFichier2) == 0) // Le meme nom
 				{
 					struct tm time;
 					strptime(dateFichier1,"%s",&time);
 					time_t temps1 = mktime(&time);
 					strptime(dateFichier2,"%s",&time);
 					time_t temps2 = mktime(&time);
-					if(difftime(temps1,temps2) != 0)//Si la derniere modification est plus recente.
+					if(difftime(temps1,temps2) != 0) // Si la derniere modification est plus recente.
 					{
 						char str[100];
 						str[0] ='\0';

@@ -21,7 +21,7 @@ int main()
 {   
   	clock_t debut, fin; 
     	double tempsPasse; 
-
+		
 	char modifTime[16];
 
    	debut = clock();
@@ -32,7 +32,7 @@ int main()
     	fin = clock(); 
     	tempsPasse = ((double)fin - debut) / CLOCKS_PER_SEC; 
     	printf("%.2f secondes se sont passées.\n", tempsPasse);
-stats_module_log();
+	stats_module_log();
 	return 0;
 }
 
